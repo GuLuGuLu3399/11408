@@ -1,6 +1,7 @@
 ---
-// 右栏目录:sticky、md+ 以上显示、纯文本(无 bg/border/shadow)。
+// 右栏目录:sticky、xl+ 以上显示、纯文本(无 bg/border/shadow)。
 // Active 指示靠 IntersectionObserver scroll-spy;点击走原生 smooth-scroll。
+// 只收录 h2/h3(章节索引),h4 以下属于正文内部组织,不进目录。
 interface Heading {
   depth: number;
   slug: string;
@@ -13,11 +14,14 @@ interface Props {
 }
 
 const { headings, class: className = '' } = Astro.props;
-const items = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
 {items.length > 0 && (
-  <nav aria-label="目录" class={`hidden xl:block w-56 shrink-0 sticky top-24 ${className}`}>
+  <nav
+    aria-label="目录"
+    class={`hidden xl:block w-56 shrink-0 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto hide-scrollbar ${className}`}
+  >
     <ul class="m-0 list-none flex flex-col gap-1.5 p-0">
       {items.map((h) => (
         <li>
@@ -26,7 +30,7 @@ const items = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
             data-toc-link={h.slug}
             is-active="false"
             class="toc-link t-link block border-l-2 border-transparent py-0.5 text-sm text-faint no-underline hover:text-muted"
-            style={h.depth === 2 ? 'padding-left:0' : h.depth === 3 ? 'padding-left:0.75rem' : 'padding-left:1.5rem'}
+            style={h.depth === 2 ? 'padding-left:0' : 'padding-left:0.75rem'}
           >
             {h.text}
           </a>
@@ -42,17 +46,26 @@ const items = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
     border-left-color: rgb(var(--c-accent));
     color: rgb(var(--c-ink));
   }
+
+  /* 隐藏原生滚动条(TOC 局部滚动用),保留滚动能力。 */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 </style>
 
 <script>
-  // Scroll-spy:观察 <article> 内所有 h2/h3/h4,以 rootMargin 上 0px / 下 -70% 判定
+  // Scroll-spy:观察 <article> 内所有 h2/h3,以 rootMargin 上 0px / 下 -70% 判定
   // 「最靠近视口顶部」的标题为 active。ClientRouter 切换页面后重新查询标题。
   function setupScrollSpy() {
     const article = document.querySelector('article.prose-blog');
     if (!article) return;
 
     const headings = Array.from(
-      article.querySelectorAll<HTMLElement>(':is(h2,h3,h4)'),
+      article.querySelectorAll<HTMLElement>(':is(h2,h3)'),
     ).filter((h) => h.id);
 
     if (headings.length === 0) return;
