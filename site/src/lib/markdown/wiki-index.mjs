@@ -43,16 +43,31 @@ async function readMarkdownFiles(dir) {
   return files;
 }
 
+// 与 Astro 静态路径生成保持一致的 slug 规则。
+// 页面实际 URL 是 slugify 后的 id（小写 + 空格→连字符 + 去标点），
+// 而 readdir 返回原始文件名（可能含大写/空格）。href 必须同样 slugify，
+// 否则在大小写敏感的部署环境（Linux/Vercel）上会 404。
+function slugifySegment(value) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, '-')
+    .replace(/[^\w一-龥-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 async function readEntry(file) {
   const source = await readFile(file, 'utf8');
   const title = readFrontmatterTitle(source);
   const id = relative(DOCS_DIR, file).split(sep).join('/').replace(/\.md$/, '');
   const stem = id.split('/').at(-1) || id;
+  const slug = id.split('/').map(slugifySegment).join('/');
 
   return {
     title: title || stem,
     stem,
-    href: `/notes/${id}/`,
+    href: `/notes/${slug}/`,
   };
 }
 
