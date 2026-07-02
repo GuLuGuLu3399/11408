@@ -66,7 +66,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
             <li v-for="item in categories[activeIndex].items" :key="item.url">
               <a
                 :href="item.url"
-                class="group flex min-w-0 items-start gap-2 no-underline outline-none"
+                class="group flex min-w-0 items-start gap-2 py-1 no-underline outline-none"
               >
                 <i class="i-lucide-file-text size-4 shrink-0 text-faint group-hover:text-accent motion-safe:transition-colors duration-150 ease-out" aria-hidden="true"></i>
                 <h3

@@ -129,6 +129,17 @@ const {
     overflow-x: clip;
   }
 
+  a,
+  button {
+    touch-action: manipulation;
+  }
+
+  @media (max-width: 640px) {
+    main > div {
+      padding-top: 1.5rem !important;
+    }
+  }
+
   /* View Transition:禁用默认交叉淡出,让 ThemeToggle 的 clip-path 动画接管。 */
   ::view-transition-old(root),
   ::view-transition-new(root) {

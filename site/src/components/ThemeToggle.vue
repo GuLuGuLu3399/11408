@@ -88,7 +88,7 @@ function shouldReduceMotion() {
        点击 / localStorage / View Transition / theme-change 事件。 -->
   <button
     type="button"
-    class="flex items-center justify-center bg-transparent border-none p-2 min-h-9 min-w-9 cursor-pointer outline-none text-muted hover:text-ink motion-safe:transition-[color,opacity,transform] duration-150 ease-out active:scale-95"
+    class="flex min-h-11 min-w-11 cursor-pointer items-center justify-center border-none bg-transparent p-2 text-muted outline-none hover:text-ink motion-safe:transition-[color,opacity,transform] duration-150 ease-out active:scale-95"
     :aria-label="label"
     :title="label"
     @click="toggleTheme"

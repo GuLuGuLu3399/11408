@@ -23,7 +23,7 @@ const posts = getPublicNotes(await getCollection('notes')).sort(byRecentDesc);
         posts.map((post) => {
           const date = post.data.updated_at ?? post.data.created_at ?? post.data.pubDate;
           return (
-            <li class="border-l-2 border-transparent px-3 py-2 hover:border-accent hover:bg-canvas/55">
+            <li class="border-l-2 border-transparent px-3 py-2.5 hover:border-accent hover:bg-canvas/55">
               <a
                 href={notePath(post.id)}
                 class="group flex min-w-0 flex-col items-start gap-1 no-underline sm:flex-row sm:items-baseline sm:gap-6"

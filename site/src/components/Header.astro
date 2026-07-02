@@ -8,17 +8,22 @@ import ThemeToggle from './ThemeToggle.vue';
     aria-label="主导航"
     class="container-page flex min-w-0 items-center gap-3 py-3 sm:justify-between sm:pb-8 sm:pt-12"
   >
-    <a href="/" class="flex items-baseline gap-1.5 no-underline t-link" aria-label={`${siteConfig.title} 首页`}>
+    <a
+      href="/"
+      class="t-link flex min-h-11 shrink-0 items-center gap-1.5 no-underline"
+      aria-label={`${siteConfig.title} 首页`}
+    >
       <span class="text-base font-bold text-ink">11408</span>
       <span class="hidden text-base font-light text-faint sm:inline">Vault</span>
     </a>
-    <ul class="m-0 flex min-w-0 flex-1 list-none items-center gap-4 overflow-x-auto p-0 sm:flex-none sm:gap-6 sm:overflow-visible">
+
+    <ul class="m-0 flex min-w-0 flex-1 list-none items-center gap-3 overflow-x-auto p-0 sm:flex-none sm:gap-6 sm:overflow-visible">
       {
         siteConfig.nav.map((item) => (
-          <li>
+          <li class="shrink-0">
             <a
               href={item.href}
-              class="t-link inline-flex items-center gap-1 font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
+              class="t-link inline-flex min-h-11 items-center gap-1 font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
             >
               <span>{item.label}</span>
             </a>
@@ -26,16 +31,17 @@ import ThemeToggle from './ThemeToggle.vue';
         ))
       }
     </ul>
+
     <div class="flex shrink-0 items-center gap-1 sm:gap-2">
       <button
         type="button"
-        aria-label="搜索 (⌘K)"
-        title="搜索 (⌘K)"
-        class="t-link inline-flex items-center gap-1.5 border-none bg-transparent p-1.5 outline-none text-faint hover:text-ink cursor-pointer"
+        aria-label="搜索"
+        title="搜索"
+        class="t-link inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-1.5 border-none bg-transparent p-2 text-faint outline-none hover:text-ink"
         data-search-trigger
       >
         <i class="i-lucide-search size-4" aria-hidden="true"></i>
-        <kbd class="font-mono text-xs text-faint">⌘K</kbd>
+        <kbd class="hidden font-mono text-xs text-faint sm:inline">Ctrl K</kbd>
       </button>
       <ThemeToggle client:load />
     </div>
@@ -43,8 +49,6 @@ import ThemeToggle from './ThemeToggle.vue';
 </header>
 
 <script>
-  // 搜索触发:点击 Header 内的搜索按钮 → 派发 open-search 事件(SearchModal 监听)。
-  // ClientRouter 切换后 Header 被重挂载,故每次 page-load 重新绑定。
   function bindSearchTrigger() {
     const btn = document.querySelector<HTMLElement>('[data-search-trigger]');
     if (!btn || btn.dataset.bound === 'true') return;
@@ -53,6 +57,7 @@ import ThemeToggle from './ThemeToggle.vue';
       window.dispatchEvent(new Event('open-search'));
     });
   }
+
   document.addEventListener('astro:page-load', bindSearchTrigger);
   bindSearchTrigger();
 </script>

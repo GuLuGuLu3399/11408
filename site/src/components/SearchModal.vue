@@ -151,31 +151,31 @@ onMounted(() => {
   <!-- 遮罩:半透明 + 毛玻璃;面板:无阴影、hairline 边框、surface 背景。 -->
   <div
     v-if="open"
-    class="fixed inset-0 z-[100] backdrop-blur-md bg-surface/80 flex justify-center px-3"
+    class="fixed inset-0 z-[100] flex justify-center bg-surface/80 px-3 backdrop-blur-md"
     @click="onBackdropClick"
   >
-    <div class="max-w-lg w-full mt-[12vh] self-start rounded-lg border border-line bg-surface overflow-hidden sm:mt-[20vh]">
+    <div class="mt-[12vh] max-h-[76dvh] w-full max-w-lg self-start overflow-hidden rounded-lg border border-line bg-surface sm:mt-[20vh]">
       <!-- 输入行:前置搜索图标 + 透明背景输入框。 -->
-      <div class="flex items-center gap-2 px-4 py-3 border-b border-line">
+      <div class="flex items-center gap-2 border-b border-line px-4 py-3">
         <i class="i-lucide-search size-4 shrink-0 text-faint" aria-hidden="true"></i>
         <input
           ref="inputEl"
           v-model="query"
           type="text"
           placeholder="搜索笔记…"
-          class="w-full bg-transparent outline-none text-ink placeholder:text-faint text-sm"
+          class="min-h-11 w-full bg-transparent text-base text-ink outline-none placeholder:text-faint sm:text-sm"
           autocomplete="off"
           spellcheck="false"
         />
-        <kbd class="font-mono text-xs text-faint shrink-0">ESC</kbd>
+        <kbd class="hidden shrink-0 font-mono text-xs text-faint sm:inline">ESC</kbd>
       </div>
       <!-- 结果列表:最大高度内滚动,无分割线。 -->
-      <ul v-if="results.length > 0" class="max-h-80 overflow-y-auto m-0 p-0 list-none">
+      <ul v-if="results.length > 0" class="m-0 max-h-[56dvh] list-none overflow-y-auto p-0">
         <li v-for="(entry, i) in results" :key="entry.url" class="m-0">
           <a
             :href="entry.url"
             :data-search-row="i"
-            class="block px-4 py-2 hover:bg-canvas/55"
+            class="block min-h-12 px-4 py-3 hover:bg-canvas/55"
             :class="i === activeIndex ? 'bg-canvas/55' : ''"
             @click.prevent="navigate(entry)"
           >
