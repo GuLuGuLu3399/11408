@@ -1,5 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join, relative, resolve, sep } from 'node:path';
+import { slugifyPath } from './slugify.mjs';
 
 const DOCS_DIR = resolve(process.cwd(), '../docs');
 
@@ -43,26 +44,13 @@ async function readMarkdownFiles(dir) {
   return files;
 }
 
-// 与 Astro 静态路径生成保持一致的 slug 规则。
-// 页面实际 URL 是 slugify 后的 id（小写 + 空格→连字符 + 去标点），
-// 而 readdir 返回原始文件名（可能含大写/空格）。href 必须同样 slugify，
-// 否则在大小写敏感的部署环境（Linux/Vercel）上会 404。
-function slugifySegment(value) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[\s_]+/g, '-')
-    .replace(/[^\w一-龥-]/g, '')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
+// slug 规则在 ./slugify.mjs（SSOT），与 Astro 内容集合的 generateId 共用同一函数。
 async function readEntry(file) {
   const source = await readFile(file, 'utf8');
   const title = readFrontmatterTitle(source);
   const id = relative(DOCS_DIR, file).split(sep).join('/').replace(/\.md$/, '');
   const stem = id.split('/').at(-1) || id;
-  const slug = id.split('/').map(slugifySegment).join('/');
+  const slug = slugifyPath(id);
 
   return {
     title: title || stem,
