@@ -1,0 +1,79 @@
+<script>
+  // remark-mermaid-block 把 ```mermaid 转成 <div class="mermaid" data-mermaid-source="…">,
+  // 这里在客户端解码源码、动态 import mermaid、把 SVG 写回同一 div。
+  // 主题响应:监听 ThemeToggle 派发的 theme-change,按新主题重渲染(data-mermaid-theme 守护)。
+  // CJK 字宽修正:fontFamily: 'inherit' 让 mermaid 用页面字体(含 PingFang SC / 微软雅黑)
+  // 测算节点宽度,配合 flowchart.padding + htmlLabels 防止中文溢出节点框。
+  const MERMAID_SELECTOR = 'div.mermaid[data-mermaid-source]';
+
+  function activeTheme(): 'dark' | 'light' {
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  }
+
+  async function renderMermaid() {
+    const theme = activeTheme();
+    // data-mermaid-source 在 innerHTML 被替换成 SVG 后仍保留,源码不丢;
+    // 只重渲染主题不符或尚未渲染的块。
+    const blocks = [...document.querySelectorAll(MERMAID_SELECTOR)].filter(
+      (block) => block.getAttribute('data-mermaid-theme') !== theme,
+    );
+
+    if (blocks.length === 0) return;
+
+    const { default: mermaid } = await import('mermaid');
+    const dark = theme === 'dark';
+
+    mermaid.initialize({
+      startOnLoad: false,
+      // htmlLabels 需要非 strict 模式;mermaid 源来自可信的 Vault 笔记,故用 loose。
+      securityLevel: 'loose',
+      // 去色:theme:'base' + 黑白灰变量,剥离默认彩色,仅保留线框图风格。
+      // fontFamily 用显式 CJK 字体栈,确保 mermaid 用 CJK 字体测算节点宽度(防溢出)。
+      theme: 'base',
+      themeVariables: dark
+        ? {
+            fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif',
+            primaryColor: '#161b22',
+            primaryTextColor: '#e2e8f0',
+            primaryBorderColor: '#30363d',
+            lineColor: '#6e7681',
+          }
+        : {
+            fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif',
+            primaryColor: '#f9fafb',
+            primaryTextColor: '#1f2937',
+            primaryBorderColor: '#d1d5db',
+            lineColor: '#9ca3af',
+          },
+      flowchart: {
+        htmlLabels: true,
+        padding: 24,
+        nodeSpacing: 50,
+        rankSpacing: 50,
+      },
+      sequence: {
+        useMaxWidth: true,
+        messageMargin: 40,
+      },
+    });
+
+    for (const [index, block] of blocks.entries()) {
+      const source = decodeURIComponent(block.getAttribute('data-mermaid-source') || '');
+
+      try {
+        const id = `mermaid-${Date.now()}-${index}`;
+        const { svg } = await mermaid.render(id, source);
+        block.innerHTML = svg;
+        block.setAttribute('data-mermaid-theme', theme);
+      } catch (error) {
+        console.warn('Mermaid render failed', error);
+      }
+    }
+  }
+
+  // ClientRouter:每次页面切换触发 astro:page-load。
+  document.addEventListener('astro:page-load', renderMermaid);
+  // ThemeToggle 派发 theme-change 时,按新主题重渲染所有图。
+  window.addEventListener('theme-change', renderMermaid);
+  renderMermaid();
+</script>

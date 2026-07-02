@@ -1,0 +1,367 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SearchModal from '../components/SearchModal.vue';
+import { siteConfig } from '../site.config';
+import 'katex/dist/katex.min.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  type?: 'website' | 'article';
+  lang?: string;
+  toc?: boolean;
+}
+
+const {
+  title,
+  description = siteConfig.description,
+  type = 'website',
+  lang = siteConfig.language,
+  toc = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <BaseHead title={title} description={description} type={type} />
+    <!-- noflash:在 Vue hydrate 前从 localStorage / system preference 恢复主题,防止闪白。 -->
+    <script is:inline>
+      (() => {
+        const storageKey = '11408-theme';
+        const stored = localStorage.getItem(storageKey);
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored === 'dark' || stored === 'light'
+          ? stored
+          : prefersDark
+            ? 'dark'
+            : 'light';
+
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    <!-- 路由过渡:仅默认淡入淡出,禁止滑动等夸张入场;reduced-motion 下由全局 CSS 禁用。 -->
+    <ClientRouter />
+  </head>
+  <body class="flex min-h-screen flex-col bg-surface font-sans text-ink antialiased selection:bg-accent/15">
+    <a
+      href="#main"
+      class="sr-only t-link focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+    >
+      跳至正文
+    </a>
+    <Header />
+    <main id="main" class="w-full">
+      <div class={toc ? 'mx-auto w-full max-w-3xl px-4 pt-8 xl:max-w-5xl xl:flex xl:items-start xl:gap-12' : 'container-page pt-8'}>
+        <slot />
+      </div>
+    </main>
+    <Footer />
+    <!-- 搜索命令面板:挂在 Layout 层(client:load)以穿越 ClientRouter 导航。 -->
+    <SearchModal client:load />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: light;
+    --c-ink: 36 41 47;
+    --c-muted: 87 96 106;
+    --c-faint: 140 149 159;
+    --c-line: 208 215 222;
+    --c-canvas: 255 255 255;
+    --c-surface: 248 250 252;
+    --c-accent: 9 105 218;
+  }
+
+  html.dark {
+    color-scheme: dark;
+    --c-ink: 230 237 243;
+    --c-muted: 139 148 158;
+    --c-faint: 110 118 129;
+    --c-line: 48 54 61;
+    --c-canvas: 22 27 34;
+    --c-surface: 13 17 23;
+    --c-accent: 88 166 255;
+  }
+
+  /* 暗色模式下,把 Typography 预设的 --un-prose-* 变量重映射到项目 token,
+     让正文/标题/列表/表格/代码等所有 prose 元素随 html.dark 翻转,
+     不依赖 media-based 的 dark: 变体,也不需要 dark:prose-invert。 */
+  html.dark .prose-blog {
+    --un-prose-body: rgb(var(--c-ink));
+    --un-prose-headings: rgb(var(--c-ink));
+    --un-prose-lead: rgb(var(--c-muted));
+    --un-prose-links: rgb(var(--c-accent));
+    --un-prose-bold: rgb(var(--c-ink));
+    --un-prose-counters: rgb(var(--c-faint));
+    --un-prose-bullets: rgb(var(--c-faint));
+    --un-prose-hr: rgb(var(--c-line));
+    --un-prose-quotes: rgb(var(--c-muted));
+    --un-prose-quote-borders: rgb(var(--c-line));
+    --un-prose-captions: rgb(var(--c-faint));
+    --un-prose-code: rgb(var(--c-ink));
+    --un-prose-pre-code: rgb(var(--c-ink));
+    --un-prose-pre-bg: rgb(var(--c-canvas));
+    --un-prose-th-borders: rgb(var(--c-line));
+    --un-prose-td-borders: rgb(var(--c-line));
+  }
+
+  html {
+    background: rgb(var(--c-surface));
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: rgb(var(--c-surface));
+  }
+
+  /* View Transition:禁用默认交叉淡出,让 ThemeToggle 的 clip-path 动画接管。 */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  /* font-smoothing 由 <body> 的 antialiased 工具类统一接管,此处不再重复声明。 */
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-accent));
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Typography 伪元素修补:仅在 .prose-blog 作用域内关闭 UnoCSS Typography 注入的
+     inline code 反引号与 blockquote 幽灵引号;blockquote 保持非斜体;fenced code
+     不继承 inline code 的背景/边距,回到 GitHub-like 技术备忘录样式。 */
+  .prose-blog code::before,
+  .prose-blog code::after {
+    content: none;
+  }
+
+  .prose-blog blockquote p:first-of-type::before,
+  .prose-blog blockquote p:last-of-type::after {
+    content: none;
+  }
+
+  .prose-blog blockquote {
+    font-style: normal;
+  }
+
+  .prose-blog pre code {
+    background: transparent;
+    border: 0;
+    padding: 0;
+  }
+
+  /* 代码字体:强制等宽栈 + 0.9em,!important 覆盖 Typography/Shiki 内联样式。 */
+  .prose-blog pre,
+  .prose-blog code,
+  .prose-blog kbd,
+  .prose-blog samp {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Menlo', 'Monaco', 'Consolas', monospace !important;
+    font-size: 0.9em !important;
+    letter-spacing: 0 !important;
+  }
+
+  /* 行内代码(p/li > code,排除 pre 内):浅灰背景 + 橙红文字(双模式可读),无边框。 */
+  .prose-blog :not(pre) > code {
+    background: rgba(115, 115, 115, 0.1) !important;
+    padding: 0.15em 0.3em !important;
+    border: 0 !important;
+    border-radius: 4px !important;
+    color: #ea580c !important;
+  }
+
+  /* 代码块容器:剥离 Shiki 彩色底/边框/阴影,仅 hairline + surface 背景。
+     !important 覆盖 Shiki 的 inline background-color;text 颜色随主题翻转。 */
+  .prose-blog pre {
+    background: rgb(var(--c-surface)) !important;
+    border: 1px solid rgb(var(--c-line)) !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    color: rgb(var(--c-ink)) !important;
+  }
+
+  /* 正文呼吸:段落与列表项强制 1.125rem / 1.8 行高 / 0.02em 字距。
+     !important 覆盖 Typography 默认;移动端(≤640px)降为 1.0625rem / 1.7。 */
+  .prose-blog p,
+  .prose-blog li {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+    font-size: 1.125rem !important;
+    line-height: 1.8 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  @media (max-width: 640px) {
+    .prose-blog p,
+    .prose-blog li {
+      font-size: 1.0625rem !important;
+      line-height: 1.7 !important;
+    }
+  }
+
+  /* 表格极简:无垂直边框,表头 2px hairline、数据行 1px(更淡)、末行无线;tabular-nums。 */
+  .prose-blog table {
+    width: 100%;
+    border-collapse: collapse !important;
+    font-variant-numeric: tabular-nums !important;
+    margin: 1.5rem 0;
+  }
+
+  .prose-blog th,
+  .prose-blog td {
+    padding: 0.75rem 1rem !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+  }
+
+  .prose-blog thead th {
+    border-bottom: 2px solid rgb(var(--c-line)) !important;
+  }
+
+  .prose-blog tbody td {
+    border-bottom: 1px solid rgb(var(--c-line) / 0.4) !important;
+  }
+
+  .prose-blog tbody tr:last-child td {
+    border-bottom: 0 !important;
+  }
+
+  /* KaTeX 数学公式:块级公式允许横向滚动,行内公式继承字号。 */
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.25rem 0;
+  }
+
+  .katex {
+    font-size: 1em;
+  }
+
+  /* WikiLink:已解析的内部链接用蓝色;未解析的用浅灰虚线,不破坏构建。 */
+  .prose-blog .internal-link {
+    color: rgb(var(--c-accent));
+    text-decoration: none;
+    text-underline-offset: 3px;
+  }
+
+  .prose-blog .internal-link:hover {
+    text-decoration: underline;
+  }
+
+  .prose-blog .wiki-link-missing {
+    color: rgb(var(--c-faint));
+    border-bottom: 1px dashed rgb(var(--c-line));
+  }
+
+  /* GitHub Alerts:仅语义左边框色,不做装饰性卡片。 */
+  .prose-blog .markdown-alert {
+    margin: 1.5rem 0;
+    padding: 0.75rem 1rem;
+    border-left: 0.25rem solid rgb(var(--c-line));
+    color: rgb(var(--c-muted));
+  }
+
+  .prose-blog .markdown-alert-title {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin: 0 0 0.5rem;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .prose-blog .markdown-alert > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* 降噪:仅 NOTE 用极淡的蓝,其余类型继承基底的 gray 边框。 */
+  .prose-blog .markdown-alert-note {
+    border-left-color: rgb(var(--c-accent) / 0.4);
+  }
+
+  /* Mermaid 容器:允许超宽图表横向滚动,而不是暴力压缩 SVG。 */
+  .prose-blog .mermaid {
+    width: 100%;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem;
+    border: 1px solid rgb(var(--c-line));
+    border-radius: 6px;
+    background: rgb(var(--c-canvas));
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  }
+
+  /* 解除 SVG 物理裁切,释放被截断的文字;阻止 SVG 被强制缩放挤压。 */
+  .prose-blog .mermaid svg {
+    max-width: none !important;
+    overflow: visible !important;
+    margin: 0 auto;
+  }
+
+  /* Mermaid 渲染产物隔离:foreignObject 内文字居中、行高收紧、溢出可见;
+     nodeLabel 文字颜色锁定(双模式可读),防止节点文字溢出/错位。 */
+  .prose-blog .mermaid foreignObject div {
+    line-height: 1.4 !important;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .prose-blog .mermaid foreignObject {
+    overflow: visible !important;
+  }
+
+  .prose-blog .mermaid .nodeLabel {
+    color: #334155 !important;
+  }
+
+  html.dark .prose-blog .mermaid .nodeLabel {
+    color: #e2e8f0 !important;
+  }
+
+  /* 隐藏 Markdown 正文首个 H1,避免和模板标题重复。 */
+  .hide-markdown-title > h1:first-child {
+    display: none;
+  }
+
+  /* TOC 锚点:为 sticky header(~80px)留出呼吸空间,避免标题被遮住。 */
+  .prose-blog :is(h2, h3, h4) {
+    scroll-margin-top: 80px;
+  }
+
+  /* a11y:减弱动态效果下,一并禁用路由视图过渡(默认淡入淡出)与所有动画/过渡。
+     ::view-transition-* 是伪元素,* 选择器覆盖不到,需单独声明。 */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
+  }
+</style>

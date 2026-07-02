@@ -1,0 +1,26 @@
+---
+import { slugifyTaxonomy } from '../lib/taxonomy';
+
+interface Props {
+  tags?: string[];
+}
+
+const tags = (Astro.props.tags ?? []).map((tag) => tag.trim()).filter(Boolean);
+---
+
+{
+  tags.length > 0 && (
+    <ul class="m-0 flex list-none flex-wrap gap-x-3 gap-y-1 p-0">
+      {tags.map((tag) => (
+        <li>
+          <a
+            href={`/tags/${slugifyTaxonomy(tag)}`}
+            class="t-link font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
+          >
+            #{tag}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

@@ -1,0 +1,7 @@
+# pnpm 11+ 构建脚本放行设置(自动生成模板)
+# 放行 esbuild(Astro/Vite 打包)与 sharp(图像优化)的 postinstall
+allowBuilds:
+  esbuild: true
+  sharp: true
+minimumReleaseAgeExclude:
+  - astro@7.0.4

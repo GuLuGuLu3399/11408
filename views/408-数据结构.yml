@@ -1,0 +1,12 @@
+name: 408 · 数据结构
+icon: 🌲
+color: "#3b82f6"
+sort: "title:asc"
+filters:
+  all:
+    - field: type
+      op: equals
+      value: 408笔记
+    - field: subject
+      op: equals
+      value: 数据结构

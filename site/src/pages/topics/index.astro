@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import KnowledgeTabs from '../../components/KnowledgeTabs.vue';
+import { buildDomainTopology, getNoteTitle } from '../../lib/taxonomy';
+import { notePath } from '../../lib/vault-notes';
+
+const notes = await getCollection('notes');
+const domains = buildDomainTopology(notes);
+
+// 把两级拓扑(domain → subjects → notes)拍平成 tab 用的 categories:
+// 每个一级知识域一个 tab,panel 里是该域全部笔记的扁平列表。
+const categories = domains.map((domain) => ({
+  name: domain.name,
+  count: domain.count,
+  items: domain.subjects.flatMap((subject) =>
+    subject.notes.map((note) => ({
+      title: getNoteTitle(note),
+      url: notePath(note.id),
+    })),
+  ),
+}));
+---
+
+<Layout title="Topics" description="按知识体系浏览 11408 Vault 笔记。">
+  <section aria-label="知识拓扑目录">
+    <p class="mb-2 font-mono text-[13px] tabular-nums tracking-tight text-faint">
+      Knowledge Map
+    </p>
+    <h1 class="mb-12 text-2xl font-semibold tracking-tight text-ink sm:mb-16 sm:text-3xl">
+      知识体系
+    </h1>
+
+    <KnowledgeTabs client:visible categories={categories} />
+  </section>
+</Layout>

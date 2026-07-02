@@ -1,0 +1,9 @@
+name: 每日心态
+icon: 🌿
+color: "#10b981"
+sort: "property:date:desc"
+filters:
+  all:
+    - field: type
+      op: equals
+      value: 心态日记

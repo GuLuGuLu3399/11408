@@ -1,0 +1,62 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from '../../components/FormattedDate.astro';
+import TagLinks from '../../components/TagLinks.astro';
+import MermaidLoader from '../../components/MermaidLoader.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import Layout from '../../layouts/Layout.astro';
+import { siteConfig } from '../../site.config';
+import { getNoteTags, getNoteTitle, getPublicNotes } from '../../lib/vault-notes';
+
+export async function getStaticPaths() {
+  const posts = getPublicNotes(await getCollection('notes'));
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+type Props = {
+  post: CollectionEntry<'notes'>;
+};
+
+const { post } = Astro.props;
+const title = getNoteTitle(post);
+const { Content, headings } = await render(post);
+
+const date = post.data.updated_at ?? post.data.created_at ?? post.data.pubDate;
+const tags = getNoteTags(post);
+---
+
+<Layout title={title} description={`${title} · ${siteConfig.title}`} type="article" toc>
+  <!-- 左侧阅读区:XL 以上随 TOC 并排,但正文死锁 max-w-2xl,绝不被 TOC 挤压。 -->
+  <article class="flex-1 min-w-0 max-w-2xl mx-auto xl:mx-0">
+    <header>
+      <h1 class="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+        {title}
+      </h1>
+      {date && <FormattedDate date={date} class="mt-4 block text-[13px]" />}
+      {tags.length > 0 && (
+        <div class="mt-3">
+          <TagLinks tags={tags} />
+        </div>
+      )}
+    </header>
+    <hr class="mt-8 border-0 border-t border-line/50" />
+    <div class="prose-blog hide-markdown-title mt-8">
+      <Content />
+    </div>
+    <MermaidLoader />
+    <hr class="mt-12 border-0 border-t border-line/50" />
+    <a
+      href="/"
+      class="t-link mt-6 inline-flex items-center gap-1.5 font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
+    >
+      <i class="i-lucide-arrow-left size-3.5" aria-hidden="true"></i>
+      cd ..
+    </a>
+  </article>
+  <!-- 右侧 TOC:仅 XL 以上显示,sticky 悬浮在正文右侧留白轨道(外太空)。 -->
+  <TableOfContents headings={headings} />
+</Layout>

@@ -1,0 +1,25 @@
+---
+import { siteConfig } from '../site.config';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-auto w-full">
+  <div class="container-page flex items-center justify-between border-t border-line/50 py-8">
+    <p class="m-0 font-mono text-[13px] tabular-nums tracking-tight text-faint">
+      © {year} · {siteConfig.title}
+    </p>
+    {
+      siteConfig.rss && (
+        <a
+          href={siteConfig.rss}
+          class="t-link inline-flex items-center gap-1 font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
+          aria-label="RSS"
+        >
+          <i class="i-lucide-rss size-3.5" aria-hidden="true"></i>
+          <span class="sr-only">RSS</span>
+        </a>
+      )
+    }
+  </div>
+</footer>

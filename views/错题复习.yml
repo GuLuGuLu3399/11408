@@ -1,0 +1,9 @@
+name: 错题复习
+icon: 📝
+color: "#ef4444"
+sort: "property:subject:asc"
+filters:
+  all:
+    - field: type
+      op: equals
+      value: 错题日记

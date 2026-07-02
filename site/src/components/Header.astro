@@ -1,0 +1,58 @@
+---
+import { siteConfig } from '../site.config';
+import ThemeToggle from './ThemeToggle.vue';
+---
+
+<header class="sticky top-0 z-50 w-full border-b border-line/50 bg-surface/80 backdrop-blur-md">
+  <nav
+    aria-label="主导航"
+    class="container-page flex items-center justify-between pb-8 pt-12"
+  >
+    <a href="/" class="flex items-baseline gap-1.5 no-underline t-link" aria-label={`${siteConfig.title} 首页`}>
+      <span class="text-base font-bold text-ink">11408</span>
+      <span class="text-base font-light text-faint">Vault</span>
+    </a>
+    <ul class="m-0 flex list-none items-center gap-6 p-0">
+      {
+        siteConfig.nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="t-link inline-flex items-center gap-1 font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
+            >
+              <span>{item.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        aria-label="搜索 (⌘K)"
+        title="搜索 (⌘K)"
+        class="t-link inline-flex items-center gap-1.5 border-none bg-transparent p-1.5 outline-none text-faint hover:text-ink cursor-pointer"
+        data-search-trigger
+      >
+        <i class="i-lucide-search size-4" aria-hidden="true"></i>
+        <kbd class="font-mono text-xs text-faint">⌘K</kbd>
+      </button>
+      <ThemeToggle client:load />
+    </div>
+  </nav>
+</header>
+
+<script>
+  // 搜索触发:点击 Header 内的搜索按钮 → 派发 open-search 事件(SearchModal 监听)。
+  // ClientRouter 切换后 Header 被重挂载,故每次 page-load 重新绑定。
+  function bindSearchTrigger() {
+    const btn = document.querySelector<HTMLElement>('[data-search-trigger]');
+    if (!btn || btn.dataset.bound === 'true') return;
+    btn.dataset.bound = 'true';
+    btn.addEventListener('click', () => {
+      window.dispatchEvent(new Event('open-search'));
+    });
+  }
+  document.addEventListener('astro:page-load', bindSearchTrigger);
+  bindSearchTrigger();
+</script>

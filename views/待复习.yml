@@ -1,0 +1,9 @@
+name: 待复习
+icon: 🔥
+color: "#ef4444"
+sort: "modified:desc"
+filters:
+  all:
+    - field: status
+      op: equals
+      value: 待复习

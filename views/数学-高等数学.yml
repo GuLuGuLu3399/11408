@@ -1,0 +1,12 @@
+name: 数学 · 高等数学
+icon: 📈
+color: "#10b981"
+sort: "title:asc"
+filters:
+  all:
+    - field: type
+      op: equals
+      value: 考研数学
+    - field: subject
+      op: equals
+      value: 高等数学

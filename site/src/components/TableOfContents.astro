@@ -1,0 +1,123 @@
+---
+// 右栏目录:sticky、md+ 以上显示、纯文本(无 bg/border/shadow)。
+// Active 指示靠 IntersectionObserver scroll-spy;点击走原生 smooth-scroll。
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+  class?: string;
+}
+
+const { headings, class: className = '' } = Astro.props;
+const items = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+---
+
+{items.length > 0 && (
+  <nav aria-label="目录" class={`hidden xl:block w-56 shrink-0 sticky top-24 ${className}`}>
+    <ul class="m-0 list-none flex flex-col gap-1.5 p-0">
+      {items.map((h) => (
+        <li>
+          <a
+            href={`#${h.slug}`}
+            data-toc-link={h.slug}
+            is-active="false"
+            class="toc-link t-link block border-l-2 border-transparent py-0.5 text-sm text-faint no-underline hover:text-muted"
+            style={h.depth === 2 ? 'padding-left:0' : h.depth === 3 ? 'padding-left:0.75rem' : 'padding-left:1.5rem'}
+          >
+            {h.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style is:global>
+  /* Active TOC 项:2px accent 左指示 + text-ink。inactive 保持 border-transparent 防止布局抖动。 */
+  .toc-link[is-active='true'] {
+    border-left-color: rgb(var(--c-accent));
+    color: rgb(var(--c-ink));
+  }
+</style>
+
+<script>
+  // Scroll-spy:观察 <article> 内所有 h2/h3/h4,以 rootMargin 上 0px / 下 -70% 判定
+  // 「最靠近视口顶部」的标题为 active。ClientRouter 切换页面后重新查询标题。
+  function setupScrollSpy() {
+    const article = document.querySelector('article.prose-blog');
+    if (!article) return;
+
+    const headings = Array.from(
+      article.querySelectorAll<HTMLElement>(':is(h2,h3,h4)'),
+    ).filter((h) => h.id);
+
+    if (headings.length === 0) return;
+
+    const links = new Map<string, HTMLAnchorElement>();
+    for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')) {
+      links.set(link.getAttribute('data-toc-link')!, link);
+    }
+
+    let activeId: string | null = null;
+
+    const setActive = (id: string | null) => {
+      if (id === activeId) return;
+      if (activeId) {
+        const prev = links.get(activeId);
+        if (prev) prev.setAttribute('is-active', 'false');
+      }
+      activeId = id;
+      if (id) {
+        const next = links.get(id);
+        if (next) next.setAttribute('is-active', 'true');
+      }
+    };
+
+    // 跟踪当前在 rootMargin 视口内的标题;选最后一个(最靠近顶部的)为 active。
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.id;
+          if (entry.isIntersecting) visible.add(id);
+          else visible.delete(id);
+        }
+
+        if (visible.size > 0) {
+          // 取可见标题中 DOM 顺序最靠后的(即最接近视口顶部的最后一个交叉点)。
+          let last: string | null = null;
+          for (const h of headings) {
+            if (visible.has(h.id)) last = h.id;
+          }
+          if (last) setActive(last);
+        }
+        // visible 为空时保留上一个 active,避免滚到页脚区域时高亮闪烁。
+      },
+      {
+        rootMargin: '0px 0px -70% 0px',
+        threshold: 0,
+      },
+    );
+
+    for (const h of headings) observer.observe(h);
+
+    // 初始:激活第一个标题。
+    if (headings[0]) setActive(headings[0].id);
+
+    // 清理钩子:页面切换前断开观察器。
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        observer.disconnect();
+      },
+      { once: true },
+    );
+  }
+
+  document.addEventListener('astro:page-load', setupScrollSpy);
+  setupScrollSpy();
+</script>

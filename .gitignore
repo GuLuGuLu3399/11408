@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────────────────────
+# 这个仓库只提交「纯净的学习文档」：docs/ 与 assets/（外加 views/
+# 里自定义的学习视图）。其它工具配置、AI agent、CI、缓存、临时
+# 文件一律不提交。
+# ─────────────────────────────────────────────────────────────
+
+# AI agent / 工具配置（个人与机器相关，非学习内容）
+/.claude/
+/.mcp.json
+/.omc/
+/AGENTS.md
+/CLAUDE.md
+/GEMINI.md
+
+# CI / 部署
+/.github/
+
+# Tolaria 应用状态（机器相关）
+/.laputa/settings.json
+/.tolaria-rename-txn/
+
+# 本地 RAG 索引与模型缓存
+/.rag-lancedb/
+/model-cache/
+
+# 周报原始喂料（调试留档，非正式产物；正式周报正常提交）
+/docs/复习周报/_weekly_raw_context.md
+
+# 缩略图 / 编辑器 / 操作系统
+._*
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
