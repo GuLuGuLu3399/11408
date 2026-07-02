@@ -31,9 +31,9 @@ const tags = getNoteTags(post);
 
 <Layout title={title} description={`${title} · ${siteConfig.title}`} type="article" toc>
   <!-- 左侧阅读区:XL 以上随 TOC 并排,但正文死锁 max-w-2xl,绝不被 TOC 挤压。 -->
-  <article class="flex-1 min-w-0 max-w-2xl mx-auto xl:mx-0">
+  <article class="mx-auto min-w-0 max-w-2xl flex-1 overflow-hidden xl:mx-0">
     <header>
-      <h1 class="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+      <h1 class="break-words text-3xl font-bold tracking-tight text-ink sm:text-4xl">
         {title}
       </h1>
       {date && <FormattedDate date={date} class="mt-4 block text-[13px]" />}

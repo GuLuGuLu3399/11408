@@ -46,7 +46,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
         :aria-selected="activeIndex === index"
         :tabindex="activeIndex === index ? 0 : -1"
         @click="activeIndex = index"
-        class="relative mr-8 border-none bg-transparent px-1 py-4 text-sm font-medium tracking-wide outline-none motion-safe:transition-[color,opacity,transform] duration-150 ease-out active:scale-95"
+        class="relative mr-5 shrink-0 border-none bg-transparent px-1 py-4 text-sm font-medium tracking-wide outline-none motion-safe:transition-[color,opacity,transform] duration-150 ease-out active:scale-95 sm:mr-8"
         :class="activeIndex === index ? 'text-ink' : 'text-muted hover:text-ink'"
       >
         {{ cat.name }}
@@ -66,11 +66,11 @@ const handleKeyDown = (e: KeyboardEvent) => {
             <li v-for="item in categories[activeIndex].items" :key="item.url">
               <a
                 :href="item.url"
-                class="group flex items-center gap-2 no-underline outline-none"
+                class="group flex min-w-0 items-start gap-2 no-underline outline-none"
               >
                 <i class="i-lucide-file-text size-4 shrink-0 text-faint group-hover:text-accent motion-safe:transition-colors duration-150 ease-out" aria-hidden="true"></i>
                 <h3
-                  class="text-base font-semibold tracking-tight text-ink group-hover:text-accent motion-safe:transition-colors duration-150 ease-out"
+                  class="min-w-0 break-words text-base font-semibold tracking-tight text-ink group-hover:text-accent motion-safe:transition-colors duration-150 ease-out"
                 >
                   {{ item.title }}
                 </h3>

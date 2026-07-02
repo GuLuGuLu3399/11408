@@ -118,8 +118,15 @@ const {
     text-rendering: optimizeLegibility;
   }
 
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   body {
     background: rgb(var(--c-surface));
+    overflow-x: clip;
   }
 
   /* View Transition:禁用默认交叉淡出,让 ThemeToggle 的 clip-path 动画接管。 */
@@ -186,6 +193,9 @@ const {
     border-radius: 6px !important;
     box-shadow: none !important;
     color: rgb(var(--c-ink)) !important;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* 正文呼吸:段落与列表项强制 1.125rem / 1.8 行高 / 0.02em 字距。
@@ -196,6 +206,7 @@ const {
     font-size: 1.125rem !important;
     line-height: 1.8 !important;
     letter-spacing: 0.02em !important;
+    overflow-wrap: anywhere;
   }
 
   @media (max-width: 640px) {
@@ -208,10 +219,28 @@ const {
 
   /* 表格极简:无垂直边框,表头 2px hairline、数据行 1px(更淡)、末行无线;tabular-nums。 */
   .prose-blog table {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    min-width: max-content;
     border-collapse: collapse !important;
     font-variant-numeric: tabular-nums !important;
     margin: 1.5rem 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .prose-blog :has(> table) {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .prose-blog img,
+  .prose-blog video,
+  .prose-blog iframe {
+    max-width: 100%;
+    height: auto;
   }
 
   .prose-blog th,
@@ -292,6 +321,7 @@ const {
   /* Mermaid 容器:允许超宽图表横向滚动,而不是暴力压缩 SVG。 */
   .prose-blog .mermaid {
     width: 100%;
+    max-width: 100%;
     margin: 1.5rem 0;
     overflow-x: auto;
     overflow-y: hidden;
@@ -300,6 +330,14 @@ const {
     border-radius: 6px;
     background: rgb(var(--c-canvas));
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 640px) {
+    .prose-blog .mermaid {
+      padding: 0.75rem;
+      border-radius: 4px;
+    }
   }
 
   /* 解除 SVG 物理裁切,释放被截断的文字;阻止 SVG 被强制缩放挤压。 */

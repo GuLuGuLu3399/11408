@@ -151,10 +151,10 @@ onMounted(() => {
   <!-- 遮罩:半透明 + 毛玻璃;面板:无阴影、hairline 边框、surface 背景。 -->
   <div
     v-if="open"
-    class="fixed inset-0 z-[100] backdrop-blur-md bg-surface/80 flex justify-center"
+    class="fixed inset-0 z-[100] backdrop-blur-md bg-surface/80 flex justify-center px-3"
     @click="onBackdropClick"
   >
-    <div class="max-w-lg w-full mx-4 mt-[20vh] self-start rounded-lg border border-line bg-surface overflow-hidden">
+    <div class="max-w-lg w-full mt-[12vh] self-start rounded-lg border border-line bg-surface overflow-hidden sm:mt-[20vh]">
       <!-- 输入行:前置搜索图标 + 透明背景输入框。 -->
       <div class="flex items-center gap-2 px-4 py-3 border-b border-line">
         <i class="i-lucide-search size-4 shrink-0 text-faint" aria-hidden="true"></i>
@@ -179,8 +179,8 @@ onMounted(() => {
             :class="i === activeIndex ? 'bg-canvas/55' : ''"
             @click.prevent="navigate(entry)"
           >
-            <span class="font-medium text-ink text-sm" v-html="highlight(entry.title)"></span>
-            <span class="text-xs text-faint ml-2">{{ entry.breadcrumb }}</span>
+            <span class="block break-words font-medium text-ink text-sm" v-html="highlight(entry.title)"></span>
+            <span class="mt-1 block break-words text-xs text-faint">{{ entry.breadcrumb }}</span>
           </a>
         </li>
       </ul>

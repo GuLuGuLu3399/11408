@@ -25,15 +25,15 @@ const recentPosts = allNotes.slice(0, 15);
             <li>
               <a
                 href={notePath(post.id)}
-                class="group flex items-baseline gap-3 no-underline outline-none"
+                class="group flex min-w-0 items-start gap-3 no-underline outline-none sm:items-baseline"
               >
                 <i
                   class="i-lucide-file-text size-4 flex-shrink-0 translate-y-0.5 text-faint group-hover:text-accent motion-safe:transition-colors duration-150 ease-out"
                   aria-hidden="true"
                 />
-                <div class="flex items-baseline gap-2">
+                <div class="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-2">
                   {date && <FormattedDate date={date} class="text-[13px]" />}
-                  <h2 class="text-base text-muted group-hover:text-ink motion-safe:transition-colors duration-150 ease-out">
+                  <h2 class="min-w-0 break-words text-base text-muted group-hover:text-ink motion-safe:transition-colors duration-150 ease-out">
                     {getNoteTitle(post)}
                   </h2>
                 </div>
