@@ -1,4 +1,5 @@
 ---
+title: CPU 与流水线
 type: 408笔记
 subject: 计算机组成原理
 status: 待复习

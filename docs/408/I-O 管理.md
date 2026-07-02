@@ -1,4 +1,5 @@
 ---
+title: I-O 管理
 type: 408笔记
 subject: 操作系统
 status: 待复习

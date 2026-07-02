@@ -1,4 +1,5 @@
 ---
+title: 计组与操作系统：软硬协同全链路
 type: 综合专题
 subject: 计组与操作系统
 status: 待复习
