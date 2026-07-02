@@ -18,18 +18,29 @@ const posts = getPublicNotes(await getCollection('notes')).sort(byRecentDesc);
         {posts.length}
       </span>
     </h1>
-    <ul class="m-0 list-none space-y-1 p-0">
+    <ul class="m-0 list-none space-y-3 p-0">
       {
         posts.map((post) => {
           const date = post.data.updated_at ?? post.data.created_at ?? post.data.pubDate;
           return (
-            <li class="border-l-2 border-transparent px-3 py-2.5 hover:border-accent hover:bg-canvas/55">
+            <li>
               <a
                 href={notePath(post.id)}
-                class="group flex min-w-0 flex-col items-start gap-1 no-underline sm:flex-row sm:items-baseline sm:gap-6"
+                class="group flex min-w-0 items-baseline gap-4 py-1 no-underline outline-none"
               >
-                {date && <FormattedDate date={date} class="shrink-0 text-[13px] sm:w-28" />}
-                <span class="t-link min-w-0 break-words text-base font-normal text-ink group-hover:text-accent">
+                <span class="flex w-36 shrink-0 items-center gap-3 text-gray-500 transition-colors duration-150 group-hover:text-gray-400">
+                  <i
+                    class="i-lucide-file-text h-4 w-4 shrink-0 translate-y-0.5"
+                    aria-hidden="true"
+                  />
+                  {date && (
+                    <FormattedDate
+                      date={date}
+                      class="text-sm tracking-tight text-current"
+                    />
+                  )}
+                </span>
+                <span class="min-w-0 break-words text-base font-medium text-ink underline-offset-4 transition-colors duration-150 group-hover:underline group-hover:decoration-gray-600 dark:text-gray-300 dark:group-hover:text-white">
                   {getNoteTitle(post)}
                 </span>
               </a>

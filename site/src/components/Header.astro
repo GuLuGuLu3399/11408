@@ -6,31 +6,33 @@ import ThemeToggle from './ThemeToggle.vue';
 <header class="sticky top-0 z-50 w-full border-b border-line/50 bg-surface/80 backdrop-blur-md">
   <nav
     aria-label="主导航"
-    class="container-page flex min-w-0 items-center gap-3 py-3 sm:justify-between sm:pb-8 sm:pt-12"
+    class="container-page flex min-w-0 items-center justify-between gap-6 py-3 sm:pb-8 sm:pt-12"
   >
-    <a
-      href="/"
-      class="t-link flex min-h-11 shrink-0 items-center gap-1.5 no-underline"
-      aria-label={`${siteConfig.title} 首页`}
-    >
-      <span class="text-base font-bold text-ink">11408</span>
-      <span class="hidden text-base font-light text-faint sm:inline">Vault</span>
-    </a>
+    <div class="flex min-w-0 items-center gap-6">
+      <a
+        href="/"
+        class="t-link flex min-h-11 shrink-0 items-center gap-1.5 no-underline"
+        aria-label={`${siteConfig.title} 首页`}
+      >
+        <span class="text-base font-bold text-ink">11408</span>
+        <span class="hidden text-base font-light text-faint sm:inline">Vault</span>
+      </a>
 
-    <ul class="m-0 flex min-w-0 flex-1 list-none items-center gap-3 overflow-x-auto p-0 sm:flex-none sm:gap-6 sm:overflow-visible">
-      {
-        siteConfig.nav.map((item) => (
-          <li class="shrink-0">
-            <a
-              href={item.href}
-              class="t-link inline-flex min-h-11 items-center gap-1 font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
-            >
-              <span>{item.label}</span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+      <ul class="m-0 flex min-w-0 list-none items-center gap-3 overflow-x-auto p-0 sm:gap-6 sm:overflow-visible">
+        {
+          siteConfig.nav.map((item) => (
+            <li class="shrink-0">
+              <a
+                href={item.href}
+                class="t-link inline-flex min-h-11 items-center gap-1 font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
+              >
+                <span>{item.label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
 
     <div class="flex shrink-0 items-center gap-1 sm:gap-2">
       <button

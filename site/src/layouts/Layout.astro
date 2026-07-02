@@ -200,14 +200,25 @@ const {
     color: #ea580c !important;
   }
 
+  .prose-blog .astro-code,
+  .prose-blog .astro-code span {
+    color: var(--shiki-light) !important;
+    background-color: var(--shiki-light-bg) !important;
+  }
+
+  html.dark .prose-blog .astro-code,
+  html.dark .prose-blog .astro-code span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+
   /* 代码块容器:剥离 Shiki 彩色底/边框/阴影,仅 hairline + surface 背景。
      !important 覆盖 Shiki 的 inline background-color;text 颜色随主题翻转。 */
   .prose-blog pre {
-    background: rgb(var(--c-surface)) !important;
+    background: transparent !important;
     border: 1px solid rgb(var(--c-line)) !important;
     border-radius: 6px !important;
     box-shadow: none !important;
-    color: rgb(var(--c-ink)) !important;
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
