@@ -1,11 +1,14 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import { injectSpeedInsights } from '@vercel/speed-insights';
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SearchModal from '../components/SearchModal.vue';
 import { siteConfig } from '../site.config';
 import 'katex/dist/katex.min.css';
+
+injectSpeedInsights();
 
 interface Props {
   title?: string;
