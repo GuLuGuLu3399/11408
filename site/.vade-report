@@ -1,0 +1,86 @@
+# Vercel Speed Insights Integration - Implementation Report
+
+## Summary
+Successfully installed and configured Vercel Speed Insights for this Astro project following the latest official documentation.
+
+## Changes Made
+
+### 1. Package Installation
+**File Modified:** `site/package.json`
+- Installed `@vercel/speed-insights` version `^2.0.0` as a dependency
+- Used pnpm (the project's package manager) to ensure proper dependency resolution
+
+### 2. Lock File Update
+**File Modified:** `site/pnpm-lock.yaml`
+- Updated with new dependencies for @vercel/speed-insights package
+- Includes all transitive dependencies required for Speed Insights functionality
+
+### 3. Layout Integration
+**File Modified:** `site/src/layouts/Layout.astro`
+
+Added two key changes:
+- **Import Statement (Line 7):** Added `import SpeedInsights from '@vercel/speed-insights/astro';`
+- **Component Placement (Line 66):** Added `<SpeedInsights />` component just before the closing `</body>` tag
+
+The component is placed after the SearchModal to ensure it loads properly with all page content.
+
+## Implementation Details
+
+### Framework-Specific Approach
+According to the official Vercel Speed Insights documentation, Astro projects have first-class integration support through the `@vercel/speed-insights/astro` module. This provides:
+
+1. **Automatic Route Detection:** The component automatically detects and reports the current route using Astro's routing system
+2. **Performance Metrics Collection:** Tracks web vitals (LCP, FID, CLS, etc.) automatically
+3. **No Development Tracking:** The package intelligently skips data collection in development mode
+4. **Custom Element Implementation:** Uses a web component (`<vercel-speed-insights>`) that injects the tracking script
+
+### Why This Location?
+The SpeedInsights component is placed in the root Layout.astro file because:
+- It ensures Speed Insights is available on every page across the entire site
+- The Layout component wraps all pages, making it the ideal single integration point
+- Placement before `</body>` follows best practices for performance tracking scripts
+
+## Testing & Verification
+
+### Build Verification ✓
+- Ran `pnpm run build` successfully
+- All 79 pages built without errors
+- No TypeScript compilation issues
+
+### Linting ✓  
+- Ran `astro check` successfully
+- 0 errors, 0 warnings, 0 hints across 31 files
+
+### Import Correction
+Initial implementation used named import `{ SpeedInsights }` which caused a build error. After inspecting the package structure, corrected to default import `import SpeedInsights from '@vercel/speed-insights/astro'` which resolved the issue.
+
+## Next Steps
+
+To complete the Speed Insights setup:
+
+1. **Enable in Vercel Dashboard:**
+   - Navigate to your project in the Vercel dashboard
+   - Go to Speed Insights section from the sidebar
+   - Click the "Enable" button
+
+2. **Deploy:** 
+   - Push these changes to your repository
+   - Vercel will automatically deploy with Speed Insights enabled
+
+3. **Verify:**
+   - After deployment and user visits, check the Speed Insights dashboard
+   - Performance metrics will begin appearing within minutes of real user traffic
+
+## Technical Notes
+
+- The package uses environment variables for configuration (PUBLIC_VERCEL_OBSERVABILITY_BASEPATH, PUBLIC_VERCEL_OBSERVABILITY_CLIENT_CONFIG)
+- These are automatically set by Vercel when Speed Insights is enabled in the dashboard
+- The component creates a custom element `<vercel-speed-insights>` that handles all tracking logic
+- Data collection only occurs in production environments (not in `astro dev`)
+
+## Files Changed
+1. `site/package.json` - Added @vercel/speed-insights dependency
+2. `site/pnpm-lock.yaml` - Updated lock file with new dependencies  
+3. `site/src/layouts/Layout.astro` - Added Speed Insights component import and usage
+
+All changes follow the project's existing code patterns and Astro best practices.

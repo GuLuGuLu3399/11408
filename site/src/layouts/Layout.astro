@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SearchModal from '../components/SearchModal.vue';
 import { siteConfig } from '../site.config';
+import SpeedInsights from '@vercel/speed-insights/astro';
 import 'katex/dist/katex.min.css';
 
 interface Props {
@@ -63,6 +64,7 @@ const {
     <Footer />
     <!-- 搜索命令面板:挂在 Layout 层(client:load)以穿越 ClientRouter 导航。 -->
     <SearchModal client:load />
+    <SpeedInsights />
   </body>
 </html>
 
