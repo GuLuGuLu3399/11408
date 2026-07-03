@@ -6,6 +6,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import NavigationFeedback from '../components/NavigationFeedback.astro';
+import MarkdownTableScroller from '../components/MarkdownTableScroller.astro';
 import SearchModal from '../components/SearchModal.vue';
 import { siteConfig } from '../site.config';
 import 'katex/dist/katex.min.css';
@@ -65,6 +66,7 @@ const {
       </div>
     </main>
     <Footer />
+    <MarkdownTableScroller />
     <!-- 搜索命令面板:挂在 Layout 层(client:load)以穿越 ClientRouter 导航。 -->
     <SearchModal client:load />
     <Analytics />
@@ -262,6 +264,47 @@ const {
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .prose-blog .table-scroll {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .prose-blog .table-scroll:focus-visible {
+    outline: 2px solid rgb(var(--c-accent));
+    outline-offset: 2px;
+  }
+
+  .prose-blog .table-scroll > table {
+    display: table;
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    margin: 0;
+    overflow: visible;
+    table-layout: auto;
+  }
+
+  .prose-blog .table-scroll th,
+  .prose-blog .table-scroll td {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .prose-blog .table-scroll {
+      margin-left: -1rem;
+      margin-right: -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
   }
 
   .prose-blog img,
