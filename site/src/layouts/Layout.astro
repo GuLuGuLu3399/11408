@@ -5,6 +5,7 @@ import SpeedInsights from '@vercel/speed-insights/astro';
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import NavigationFeedback from '../components/NavigationFeedback.astro';
 import SearchModal from '../components/SearchModal.vue';
 import { siteConfig } from '../site.config';
 import 'katex/dist/katex.min.css';
@@ -57,6 +58,7 @@ const {
       跳至正文
     </a>
     <Header />
+    <NavigationFeedback />
     <main id="main" class="w-full">
       <div class={toc ? 'mx-auto w-full max-w-3xl px-4 pt-8 xl:max-w-5xl xl:flex xl:items-start xl:gap-12' : 'container-page pt-8'}>
         <slot />

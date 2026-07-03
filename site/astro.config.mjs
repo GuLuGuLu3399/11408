@@ -13,6 +13,10 @@ import remarkMermaidBlock from './src/lib/markdown/remark-mermaid-block.mjs';
 export default defineConfig({
   site: 'https://11408.vercel.app',
   compressHTML: true,
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'hover',
+  },
   markdown: {
     syntaxHighlight: 'shiki',
     shikiConfig: {

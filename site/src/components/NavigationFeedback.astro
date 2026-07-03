@@ -1,0 +1,149 @@
+<div class="nav-feedback" aria-hidden="true">
+  <div class="nav-feedback__bar"></div>
+</div>
+<div class="nav-feedback__status" role="status" aria-live="polite">
+  Loading
+</div>
+
+<script>
+  const SHOW_DELAY = 120;
+  const MIN_VISIBLE = 260;
+  const SAME_ORIGIN = window.location.origin;
+
+  let showTimer: number | undefined;
+  let startedAt = 0;
+
+  const root = document.documentElement;
+  const status = document.querySelector<HTMLElement>('.nav-feedback__status');
+
+  function isModifiedClick(event: MouseEvent) {
+    return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
+  }
+
+  function isInternalNavigation(anchor: HTMLAnchorElement) {
+    const url = new URL(anchor.href, window.location.href);
+    if (url.origin !== SAME_ORIGIN) return false;
+    if (anchor.target && anchor.target !== '_self') return false;
+    if (anchor.hasAttribute('download')) return false;
+    return url.pathname !== window.location.pathname || url.search !== window.location.search;
+  }
+
+  function startFeedback() {
+    window.clearTimeout(showTimer);
+    showTimer = window.setTimeout(() => {
+      startedAt = performance.now();
+      root.dataset.navigation = 'pending';
+      if (status) status.textContent = 'Loading';
+    }, SHOW_DELAY);
+  }
+
+  function stopFeedback() {
+    window.clearTimeout(showTimer);
+    const elapsed = performance.now() - startedAt;
+    const wait = startedAt > 0 ? Math.max(0, MIN_VISIBLE - elapsed) : 0;
+    window.setTimeout(() => {
+      delete root.dataset.navigation;
+      startedAt = 0;
+      if (status) status.textContent = '';
+    }, wait);
+  }
+
+  document.addEventListener('click', (event) => {
+    if (!(event instanceof MouseEvent) || isModifiedClick(event)) return;
+    const anchor = (event.target as Element | null)?.closest?.('a[href]');
+    if (!(anchor instanceof HTMLAnchorElement) || !isInternalNavigation(anchor)) return;
+    startFeedback();
+  }, { capture: true });
+
+  document.addEventListener('astro:before-preparation', startFeedback);
+  document.addEventListener('astro:after-swap', stopFeedback);
+  document.addEventListener('astro:page-load', stopFeedback);
+  window.addEventListener('pageshow', stopFeedback);
+</script>
+
+<style is:global>
+  .nav-feedback {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 70;
+    height: 2px;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 120ms ease-out;
+  }
+
+  .nav-feedback__bar {
+    width: 100%;
+    height: 100%;
+    background: rgb(var(--c-accent));
+    transform: translateX(-100%);
+    transform-origin: left center;
+  }
+
+  html[data-navigation='pending'] .nav-feedback {
+    opacity: 1;
+  }
+
+  html[data-navigation='pending'] .nav-feedback__bar {
+    animation: nav-feedback-progress 1.15s cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+  }
+
+  .nav-feedback__status {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 70;
+    max-width: min(16rem, calc(100vw - 2rem));
+    border: 1px solid rgb(var(--c-line));
+    border-radius: 6px;
+    background: rgb(var(--c-surface) / 0.92);
+    padding: 0.5rem 0.625rem;
+    color: rgb(var(--c-muted));
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition: opacity 120ms ease-out, transform 120ms ease-out;
+    backdrop-filter: blur(10px);
+  }
+
+  html[data-navigation='pending'] .nav-feedback__status {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @keyframes nav-feedback-progress {
+    0% {
+      transform: translateX(-100%) scaleX(0.35);
+    }
+    45% {
+      transform: translateX(-20%) scaleX(0.65);
+    }
+    100% {
+      transform: translateX(100%) scaleX(0.25);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .nav-feedback__status {
+      right: 0.75rem;
+      bottom: 0.75rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-feedback,
+    .nav-feedback__status {
+      transition: none;
+    }
+
+    html[data-navigation='pending'] .nav-feedback__bar {
+      animation: none;
+      transform: translateX(0);
+    }
+  }
+</style>
