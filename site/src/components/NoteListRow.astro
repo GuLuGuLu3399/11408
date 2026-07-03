@@ -1,0 +1,40 @@
+---
+// Fixed Metadata Rail 列表行:[icon + YYYY-MM-DD w-36 mono] [标题](memo §03-2)。
+// 纪律:hover 不改变整行背景;只让标题出现极淡下划线(decoration-line)。
+// 日期缺省时(如按标题排序的专题列表)退化为 [icon] [标题],标题仍从同一竖轴起步。
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+  href: string;
+  title: string;
+  date?: Date | string | null;
+  icon?: string; // 默认 file-text;错题/周报可换 circle-x / calendar-range
+  class?: string;
+}
+
+const {
+  href,
+  title,
+  date,
+  icon = 'i-lucide-file-text',
+  class: className = '',
+} = Astro.props;
+
+// 有日期 → 锁定 w-36 元数据列;无日期 → 仅 icon,标题紧跟,保持左轴对齐。
+const railClass = date ? 'w-36 shrink-0' : 'shrink-0';
+---
+
+<a
+  href={href}
+  class:list={['group flex min-w-0 items-baseline gap-4 py-1 no-underline outline-none', className]}
+>
+  <span class:list={['flex items-center gap-3 text-faint', railClass]}>
+    <i class:list={[icon, 'h-4 w-4 shrink-0 translate-y-0.5']} aria-hidden="true" />
+    {date && <FormattedDate date={date} class="text-sm tracking-tight text-current" />}
+  </span>
+  <span
+    class="min-w-0 break-words text-base font-medium text-ink underline-offset-4 decoration-line motion-safe:transition-colors duration-150 group-hover:underline"
+  >
+    {title}
+  </span>
+</a>

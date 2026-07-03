@@ -8,6 +8,7 @@ export const siteConfig = {
   language: 'zh-CN',
   nav: [
     { label: 'Topics', href: '/topics' },
+    { label: 'About', href: '/about' },
   ],
   rss: '/rss.xml',
   social: [

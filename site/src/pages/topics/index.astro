@@ -1,25 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
-import KnowledgeTabs from '../../components/KnowledgeTabs.vue';
-import { buildDomainTopology, getNoteTitle } from '../../lib/taxonomy';
-import { notePath } from '../../lib/vault-notes';
+import NoteListRow from '../../components/NoteListRow.astro';
+import { buildDomainTopology } from '../../lib/taxonomy';
+import { getNoteTitle, notePath } from '../../lib/vault-notes';
 
 const notes = await getCollection('notes');
 const domains = buildDomainTopology(notes);
-
-// 把两级拓扑(domain → subjects → notes)拍平成 tab 用的 categories:
-// 每个一级知识域一个 tab,panel 里是该域全部笔记的扁平列表。
-const categories = domains.map((domain) => ({
-  name: domain.name,
-  count: domain.count,
-  items: domain.subjects.flatMap((subject) =>
-    subject.notes.map((note) => ({
-      title: getNoteTitle(note),
-      url: notePath(note.id),
-    })),
-  ),
-}));
+const total = domains.reduce((sum, d) => sum + d.count, 0);
 ---
 
 <Layout title="Topics" description="按知识体系浏览 11408 Vault 笔记。">
@@ -29,8 +17,53 @@ const categories = domains.map((domain) => ({
     </p>
     <h1 class="mb-12 text-2xl font-semibold tracking-tight text-ink sm:mb-16 sm:text-3xl">
       知识体系
+      <span class="ml-3 font-mono text-[13px] tabular-nums tracking-tight text-faint">
+        {total}
+      </span>
     </h1>
 
-    <KnowledgeTabs client:visible categories={categories} />
+    {
+      /* 每个 domain 一张 muted card(专题入口 / 聚合块,memo §04)。
+         card 自带 id,供首页 02/TOPICS 的 /topics#<id> 锚点跳转。 */
+    }
+    <div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+      {
+        domains.map((domain) => (
+          <section
+            id={domain.id}
+            class="scroll-mt-24 rounded-md border border-line bg-canvas/40 p-5 motion-safe:transition-colors duration-150 hover:border-ink/20"
+            aria-label={domain.name}
+          >
+            <header class="mb-4 flex items-baseline justify-between gap-3 border-b border-line/60 pb-3">
+              <h2 class="text-base font-semibold tracking-tight text-ink">
+                {domain.name}
+              </h2>
+              <span class="shrink-0 font-mono text-[13px] tabular-nums tracking-tight text-faint">
+                {domain.count}
+              </span>
+            </header>
+            <div class="flex flex-col gap-5">
+              {domain.subjects.map((subject) => (
+                <div>
+                  <p class="mb-2 font-mono text-[12px] tabular-nums tracking-tight text-faint">
+                    {subject.name}
+                  </p>
+                  <ul class="m-0 list-none space-y-2 p-0">
+                    {subject.notes.map((note) => (
+                      <li>
+                        <NoteListRow
+                          href={notePath(note.id)}
+                          title={getNoteTitle(note)}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+    </div>
   </section>
 </Layout>

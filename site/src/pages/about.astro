@@ -1,0 +1,131 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SectionRail from '../components/SectionRail.astro';
+import { siteConfig } from '../site.config';
+
+const year = new Date().getFullYear();
+
+// /now:眼下正在做的事,由操作员维护。参考 Derek Sivers /now,不做营销叙事。
+const now: Array<{ tag: string; item: string }> = [
+  { tag: '微积分', item: '深入攻克一元函数积分学与多元微分极值问题' },
+  { tag: '计网', item: '二刷数据链路层(CSMA/CD、CRC 校验)硬核错题' },
+  { tag: '架构', item: '收敛 11408 Vault 路由层 slugify 共享模块与自动化 Lint 钩子' },
+  { tag: '状态', item: '全面对抗遗忘,基于 Tolaria 引擎重构 RAG 本地知识检索分块' },
+];
+
+// 工具栈:极克制的「配置表」,mono 名称 + 一句职责,不堆图标墙(memo §03-4)。
+const stack: Array<{ name: string; role: string }> = [
+  { name: 'Astro', role: '静态阅读层' },
+  { name: 'Vue', role: '交互 islands · 搜索 / 目录 / 主题' },
+  { name: 'UnoCSS', role: '原子化样式与设计 token' },
+  { name: 'Python', role: '构建脚本与周报自动化' },
+  { name: 'Tolaria', role: 'Vault 笔记引擎' },
+  { name: 'RAG', role: '本地知识检索' },
+];
+---
+
+<Layout title={`About · ${siteConfig.title}`} description="11408 Vault 的系统说明书 / now page。">
+  <!-- 终端式头部:配置文件风格,不放生活照;仅一个小尺寸工程化图形块(memo §03-4)。 -->
+  <header class="mb-16 sm:mb-24">
+    <div class="flex items-center gap-4">
+      <div
+        class="flex size-16 shrink-0 items-center justify-center rounded-md border border-line bg-canvas/60 font-mono text-2xl text-faint"
+        aria-hidden="true"
+      >
+        ▦
+      </div>
+      <div class="min-w-0">
+        <p class="font-mono text-[13px] tabular-nums tracking-tight text-faint">
+          operator @ 11408-vault
+        </p>
+        <h1 class="mt-1 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+          System README
+        </h1>
+      </div>
+    </div>
+    <p class="mt-6 max-w-prose text-base leading-[1.8] text-muted">
+      这是 <span class="font-mono text-ink">11408 Vault</span> 的操作员说明。不是简历,不是作品集——一份正在运行的学习系统的 README。
+    </p>
+  </header>
+
+  <div class="flex flex-col gap-16 sm:gap-24">
+    <SectionRail index="01" label="WHO">
+      <p class="max-w-prose text-base leading-[1.8] text-muted">
+        <span class="font-medium text-ink">操作员 GuLuGuLu。</span>
+        一名在 408(数据结构 / 组成原理 / 操作系统 / 计算机网络)与考研数学之间反复打磨的计算机学习者。相信把一件事讲清楚,比读过更重要——这个 Vault 就是「讲清楚」的副产物。
+      </p>
+    </SectionRail>
+
+    <SectionRail index="02" label="WHY">
+      <ul class="m-0 list-none space-y-3 p-0">
+        <li class="flex items-baseline gap-3">
+          <span class="font-mono text-[13px] text-faint">—</span>
+          <p class="m-0 text-base leading-[1.7]">
+            <span class="font-semibold text-ink">费曼学习法。</span>
+            <span class="text-muted">用最朴素的话复述,直到卡壳的地方暴露。</span>
+          </p>
+        </li>
+        <li class="flex items-baseline gap-3">
+          <span class="font-mono text-[13px] text-faint">—</span>
+          <p class="m-0 text-base leading-[1.7]">
+            <span class="font-semibold text-ink">数字大脑。</span>
+            <span class="text-muted">把记忆外包给一个可检索、可交叉引用的系统。</span>
+          </p>
+        </li>
+        <li class="flex items-baseline gap-3">
+          <span class="font-mono text-[13px] text-faint">—</span>
+          <p class="m-0 text-base leading-[1.7]">
+            <span class="font-semibold text-ink">对抗遗忘。</span>
+            <span class="text-muted">用复习节奏与错题闭环,把「看过」变成「记住」。</span>
+          </p>
+        </li>
+        <li class="flex items-baseline gap-3">
+          <span class="font-mono text-[13px] text-faint">—</span>
+          <p class="m-0 text-base leading-[1.7]">
+            <span class="font-semibold text-ink">错题闭环。</span>
+            <span class="text-muted">每一道错题都是一次定向修补,而不是分数的终判。</span>
+          </p>
+        </li>
+      </ul>
+    </SectionRail>
+
+    <SectionRail index="03" label="NOW">
+      <ul class="m-0 list-none divide-y divide-line/50 p-0">
+        {
+          now.map((row) => (
+            <li class="flex items-baseline gap-4 py-3 first:pt-0 last:pb-0">
+              <span class="w-16 shrink-0 font-mono text-[13px] tabular-nums tracking-tight text-faint">
+                {row.tag}
+              </span>
+              <span class="min-w-0 break-words text-base leading-[1.6] text-ink">
+                {row.item}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </SectionRail>
+
+    <SectionRail index="04" label="STACK">
+      <ul class="m-0 list-none divide-y divide-line/50 p-0">
+        {
+          stack.map((s) => (
+            <li class="flex items-baseline gap-4 py-3 first:pt-0 last:pb-0">
+              <span class="w-28 shrink-0 font-mono text-[13px] tracking-tight text-ink">
+                {s.name}
+              </span>
+              <span class="min-w-0 break-words text-[15px] leading-[1.6] text-muted">
+                {s.role}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </SectionRail>
+  </div>
+
+  <hr class="mt-16 border-0 border-t border-line/50" />
+  <p class="mt-6 font-mono text-[13px] tabular-nums tracking-tight text-faint">
+    © {year} · {siteConfig.title} · README 随系统迭代
+  </p>
+</Layout>

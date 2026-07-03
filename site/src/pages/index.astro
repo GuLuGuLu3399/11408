@@ -1,60 +1,147 @@
 ---
 import { getCollection } from 'astro:content';
-import FormattedDate from '../components/FormattedDate.astro';
 import Layout from '../layouts/Layout.astro';
+import SectionRail from '../components/SectionRail.astro';
+import NoteListRow from '../components/NoteListRow.astro';
 import { siteConfig } from '../site.config';
-import { byRecentDesc, getNoteTitle, getPublicNotes, notePath } from '../lib/vault-notes';
+import {
+  byRecentDesc,
+  getNoteKind,
+  getNoteTitle,
+  getPublicNotes,
+  notePath,
+  type NoteEntry,
+} from '../lib/vault-notes';
+import { buildKnowledgeMap, slugifyTaxonomy } from '../lib/taxonomy';
 
-const allNotes = getPublicNotes(await getCollection('notes')).sort(byRecentDesc);
-const recentPosts = allNotes.slice(0, 15);
+const all = getPublicNotes(await getCollection('notes')).sort(byRecentDesc);
+
+// Section Rail 数据分流:复用 getNoteKind(基于 type 标记),不引入新数据源。
+const recent = all.slice(0, 8);
+const mistakes = all.filter((n) => getNoteKind(n) === '错题日记');
+const weekly = all.filter((n) => getNoteKind(n) === '周报');
+const domains = buildKnowledgeMap(all); // 紧凑型:domain 名 + 计数
+
+// 安全日期回退:updated_at → created_at → pubDate → null。
+const noteDate = (n: NoteEntry) =>
+  n.data.updated_at ?? n.data.created_at ?? n.data.pubDate ?? null;
+
+const mistakesTag = slugifyTaxonomy('错题日记');
+const weeklyTag = slugifyTaxonomy('周报');
 ---
 
 <Layout title={siteConfig.title} description={siteConfig.description}>
-  <section aria-label="最新笔记">
-    <p class="mb-2 font-mono text-[13px] tabular-nums tracking-tight text-faint">
-      Vault Notes · 2026
+  <!-- 页面标题:克制的工程化 eyebrow + 描述性 H1,不做营销 hero(memo §05 红线)。 -->
+  <header class="mb-16 sm:mb-24">
+    <p class="font-mono text-[13px] tabular-nums tracking-tight text-faint">
+      11408 Vault · 2026
     </p>
-    <h1 class="mb-12 text-2xl font-semibold tracking-tight text-ink sm:mb-16 sm:text-3xl">
-      最新笔记
+    <h1 class="mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+      计算机基础与考研复习 · 笔记库
     </h1>
-    <ul class="m-0 list-none space-y-4 p-0">
-      {
-        recentPosts.map((post) => {
-          const date = post.data.updated_at ?? post.data.created_at ?? post.data.pubDate;
-          return (
+  </header>
+
+  <div class="flex flex-col gap-16 sm:gap-24">
+    <SectionRail
+      index="01"
+      label="RECENT"
+      href="/notes"
+      hrefLabel="View all notes"
+      count={all.length}
+    >
+      <ul class="m-0 list-none space-y-3 p-0">
+        {
+          recent.map((post) => (
+            <li>
+              <NoteListRow
+                href={notePath(post.id)}
+                title={getNoteTitle(post)}
+                date={noteDate(post)}
+              />
+            </li>
+          ))
+        }
+      </ul>
+    </SectionRail>
+
+    <SectionRail
+      index="02"
+      label="TOPICS"
+      href="/topics"
+      hrefLabel="Browse knowledge map"
+    >
+      <ul class="m-0 list-none space-y-3 p-0">
+        {
+          domains.map((d) => (
             <li>
               <a
-                href={notePath(post.id)}
-                class="group flex min-w-0 items-baseline gap-4 py-1 no-underline outline-none"
+                href={`/topics#${d.id}`}
+                class="group flex min-w-0 items-baseline justify-between gap-4 py-1 no-underline outline-none"
               >
-                <span class="flex w-36 shrink-0 items-center gap-3 text-gray-500 transition-colors duration-150 group-hover:text-gray-400">
-                  <i
-                    class="i-lucide-file-text h-4 w-4 shrink-0 translate-y-0.5"
-                    aria-hidden="true"
-                  />
-                  {date && (
-                    <FormattedDate
-                      date={date}
-                      class="text-sm tracking-tight text-current"
-                    />
-                  )}
+                <span class="min-w-0 break-words text-base font-medium text-ink underline-offset-4 decoration-line motion-safe:transition-colors duration-150 group-hover:underline">
+                  {d.name}
                 </span>
-                <h2 class="min-w-0 break-words text-base font-medium text-ink underline-offset-4 transition-colors duration-150 group-hover:underline group-hover:decoration-gray-600 dark:text-gray-300 dark:group-hover:text-white">
-                  {getNoteTitle(post)}
-                </h2>
+                <span class="shrink-0 font-mono text-[13px] tabular-nums tracking-tight text-faint">
+                  {d.count}
+                </span>
               </a>
             </li>
-          );
-        })
-      }
-    </ul>
+          ))
+        }
+      </ul>
+    </SectionRail>
 
-    <a
-      href="/notes"
-      class="t-link mt-10 inline-flex items-center gap-1.5 font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
-    >
-      View all notes ({allNotes.length})
-      <i class="i-lucide-arrow-right size-3.5" aria-hidden="true"></i>
-    </a>
-  </section>
+    {
+      /* 03 / MISTAKES —— 仅当存在错题日记时陈列,避免空壳段。
+         错题 icon 用 circle-x 与 RECENT 的 file-text 区分。 */
+      mistakes.length > 0 && (
+        <SectionRail
+          index="03"
+          label="MISTAKES"
+          href={`/tags/${mistakesTag}`}
+          hrefLabel="Review all mistakes"
+          count={mistakes.length}
+        >
+          <ul class="m-0 list-none space-y-3 p-0">
+            {mistakes.slice(0, 6).map((post) => (
+              <li>
+                <NoteListRow
+                  href={notePath(post.id)}
+                  title={getNoteTitle(post)}
+                  date={noteDate(post)}
+                  icon="i-lucide-circle-x"
+                />
+              </li>
+            ))}
+          </ul>
+        </SectionRail>
+      )
+    }
+
+    {
+      /* 04 / WEEKLY —— 周报入口,icon 用 calendar-range。 */
+      weekly.length > 0 && (
+        <SectionRail
+          index="04"
+          label="WEEKLY"
+          href={`/tags/${weeklyTag}`}
+          hrefLabel="All weekly notes"
+          count={weekly.length}
+        >
+          <ul class="m-0 list-none space-y-3 p-0">
+            {weekly.slice(0, 6).map((post) => (
+              <li>
+                <NoteListRow
+                  href={notePath(post.id)}
+                  title={getNoteTitle(post)}
+                  date={noteDate(post)}
+                  icon="i-lucide-calendar-range"
+                />
+              </li>
+            ))}
+          </ul>
+        </SectionRail>
+      )
+    }
+  </div>
 </Layout>

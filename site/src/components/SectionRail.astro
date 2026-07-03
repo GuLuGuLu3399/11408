@@ -1,0 +1,56 @@
+---
+// Section Rail:[编号 / 标签] 左轨 + 内容右轨。
+// 吸收 astro-theme-pure 的 Section.astro 双栏骨架,去掉卡片背景,
+// 只用 mono 编号标签 + 分区间距建立秩序(memo §03-1)。
+// 编号必须表达真实阅读路径(首页 RECENT → TOPICS → MISTAKES → WEEKLY),不作为装饰。
+interface Props {
+  index: string; // 例如 "01"
+  label: string; // 例如 "RECENT"
+  href?: string; // 「更多」链接;不传则不渲染
+  hrefLabel?: string; // 「更多」文案
+  count?: number; // 段内总数,可选附在「更多」后
+  class?: string;
+}
+
+const {
+  index,
+  label,
+  href,
+  hrefLabel = 'View all',
+  count,
+  class: className = '',
+} = Astro.props;
+---
+
+<section
+  class:list={['flex flex-col gap-6 sm:flex-row sm:gap-12', className]}
+  aria-label={label}
+>
+  <!-- 左轨:固定宽度;移动端塌缩为顶部 eyebrow。只承载编号标签,不承担导航。 -->
+  <div class="shrink-0 sm:w-40">
+    <div
+      class="flex items-baseline gap-2 font-mono text-[13px] tabular-nums tracking-tight text-faint"
+    >
+      <span>{index}</span>
+      <span aria-hidden="true">/</span>
+      <span>{label}</span>
+    </div>
+  </div>
+
+  <!-- 右轨:内容;「更多」链接(若有)沉到内容底部,不在 rail 里抢路径。 -->
+  <div class="min-w-0 flex-1">
+    <slot />
+    {
+      href && (
+        <a
+          href={href}
+          class="t-link mt-8 inline-flex items-center gap-1.5 font-mono text-[13px] tabular-nums tracking-tight text-faint no-underline hover:text-ink"
+        >
+          <span>{hrefLabel}</span>
+          {typeof count === 'number' && <span>{count}</span>}
+          <i class="i-lucide-arrow-right size-3.5" aria-hidden="true" />
+        </a>
+      )
+    }
+  </div>
+</section>
