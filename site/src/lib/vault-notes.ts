@@ -17,6 +17,7 @@ const TYPE_LABELS = new Set([
   '周报',
   '综合专题',
   '心态日记',
+  '日报',
   'Note',
 ]);
 

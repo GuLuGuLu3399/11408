@@ -1,0 +1,7 @@
+name: 错题日记
+sort: date
+filters:
+  all:
+    - field: type
+      op: equals
+      value: 错题日记

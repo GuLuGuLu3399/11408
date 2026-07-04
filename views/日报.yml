@@ -1,0 +1,7 @@
+name: 复习日报
+sort: date
+filters:
+  all:
+    - field: type
+      op: equals
+      value: 日报

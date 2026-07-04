@@ -1,0 +1,7 @@
+name: 每日心态
+sort: date
+filters:
+  all:
+    - field: type
+      op: equals
+      value: 心态日记
