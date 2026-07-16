@@ -1,6 +1,7 @@
 import importlib.util
 import io
 import json
+import re
 import tempfile
 import unittest
 from contextlib import redirect_stderr
@@ -161,10 +162,17 @@ class AgentContractTests(unittest.TestCase):
         agents_text = AGENTS_PATH.read_text(encoding="utf-8")
         note_format_text = NOTE_FORMAT_PATH.read_text(encoding="utf-8")
 
-        for note_type in ("note", "mistake", "flashcard", "progress", "summary"):
-            with self.subTest(note_type=note_type):
-                self.assertIn(note_type, agents_text)
-                self.assertIn(note_type, note_format_text)
+        supported_types_match = re.search(
+            r"^For study notes, the supported types are exactly (?P<types>.+)\.$",
+            agents_text,
+            re.MULTILINE,
+        )
+        self.assertIsNotNone(supported_types_match)
+        assert supported_types_match is not None
+        self.assertEqual(
+            ("note", "mistake", "flashcard", "progress", "summary"),
+            tuple(re.findall(r"`([^`]+)`", supported_types_match.group("types"))),
+        )
 
         expected_outlines = (
             "| `note` | Conclusion; conditions or steps | Traps |",
@@ -196,6 +204,10 @@ class AgentContractTests(unittest.TestCase):
                 self.assertIn(f"- **{option}.**", note_format_text)
         self.assertIn("| Option | Judgment | Reason |", note_format_text)
         self.assertIn("horizontal multiple-choice options", note_format_text)
+        self.assertIn(
+            "The same-line form `A. ... | B. ... | C. ... | D. ...` is forbidden.",
+            note_format_text,
+        )
 
 
 if __name__ == "__main__":
