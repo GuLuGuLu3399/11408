@@ -1,12 +1,12 @@
 ---
 title: OS 弱点辨析手册：对比驱动型知识卡
-type: 综合专题
+type: summary
 subject: 操作系统
-status: 待复习
+status: review
 related_to:
-  - "[[进程与线程]]"
-  - "[[死锁]]"
-  - "[[内存管理]]"
+- "[[进程与线程]]"
+- "[[死锁]]"
+- "[[内存管理]]"
 uuid: 4f2c9ab1-b730-435c-8bd4-99cdfe500f58
 created_at: 2026-05-08T13:33:05Z
 updated_at: 2026-05-09T11:13:52Z

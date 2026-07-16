@@ -1,12 +1,12 @@
 ---
 title: TCP 拥塞控制
-type: 408笔记
+type: note
 subject: 计算机网络
-status: 待复习
+status: review
 related_to:
-  - "[[tcp-三次握手]]"
-  - "[[udp-协议]]"
-  - "[[osi-与-tcp-ip-模型]]"
+- "[[tcp-三次握手]]"
+- "[[udp-协议]]"
+- "[[osi-与-tcp-ip-模型]]"
 uuid: 33fe94fe-3162-4e53-8662-9412b2951445
 created_at: 2026-05-02T13:07:49Z
 updated_at: 2026-05-07T11:25:04Z

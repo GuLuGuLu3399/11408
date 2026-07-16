@@ -1,10 +1,10 @@
 ---
 title: HTTP 协议
-type: 408笔记
+type: note
 subject: 计算机网络
-status: 待复习
+status: review
 related_to:
-  - "[[osi-与-tcp-ip-模型]]"
+- "[[osi-与-tcp-ip-模型]]"
 uuid: 79b3640e-f416-49b0-b99d-5694adba6f45
 created_at: 2026-05-02T13:07:49Z
 updated_at: 2026-05-09T16:39:23Z

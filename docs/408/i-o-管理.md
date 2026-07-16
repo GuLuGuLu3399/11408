@@ -1,11 +1,11 @@
 ---
 title: I-O 管理
-type: 408笔记
+type: note
 subject: 操作系统
-status: 待复习
+status: review
 related_to:
-  - "[[文件系统]]"
-  - "[[总线与-i-o-系统]]"
+- "[[文件系统]]"
+- "[[总线与-i-o-系统]]"
 uuid: 573c6632-0642-4552-951c-fb1cc1f62736
 created_at: 2026-05-02T13:07:49Z
 updated_at: 2026-05-06T01:07:22Z

@@ -1,12 +1,12 @@
 ---
 title: CPU 调度算法
-type: 408笔记
+type: note
 subject: 操作系统
-status: 待复习
+status: review
 related_to:
-  - "[[进程与线程]]"
-  - "[[进程同步与互斥]]"
-  - "[[cpu-与流水线]]"
+- "[[进程与线程]]"
+- "[[进程同步与互斥]]"
+- "[[cpu-与流水线]]"
 uuid: c2d4b5a6-6e7f-8091-a0c2-2e3f4a5b6c7d
 created_at: 2026-06-26T00:00:00Z
 updated_at: 2026-06-26T00:00:00Z

@@ -1,12 +1,12 @@
 ---
 title: 计组与操作系统：软硬协同全链路
-type: 综合专题
+type: summary
 subject: 计组与操作系统
-status: 待复习
+status: review
 related_to:
-  - "[[cpu-与流水线]]"
-  - "[[进程与线程]]"
-  - "[[内存管理]]"
+- "[[cpu-与流水线]]"
+- "[[进程与线程]]"
+- "[[内存管理]]"
 uuid: 94905fcc-b022-485f-9f08-aeac334ecd94
 created_at: 2026-05-08T03:34:34Z
 updated_at: 2026-05-09T11:13:37Z

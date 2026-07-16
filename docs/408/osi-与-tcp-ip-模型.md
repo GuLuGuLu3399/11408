@@ -1,14 +1,14 @@
 ---
 title: OSI 与 TCP-IP 模型
-type: 408笔记
+type: note
 subject: 计算机网络
-status: 待复习
+status: review
 related_to:
-  - "[[tcp-三次握手]]"
-  - "[[tcp-拥塞控制]]"
-  - "[[http-协议]]"
-  - "[[物理层]]"
-  - "[[数据链路层]]"
+- "[[tcp-三次握手]]"
+- "[[tcp-拥塞控制]]"
+- "[[http-协议]]"
+- "[[物理层]]"
+- "[[数据链路层]]"
 uuid: 4dcdeb4a-03c3-40b7-8dd7-187cc612f966
 created_at: 2026-05-02T13:07:49Z
 updated_at: 2026-05-05T14:34:11Z

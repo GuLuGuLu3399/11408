@@ -1,10 +1,10 @@
 ---
 title: IP 地址与子网划分
-type: 408笔记
+type: note
 subject: 计算机网络
-status: 待复习
+status: review
 related_to:
-  - "[[osi-与-tcp-ip-模型]]"
+- "[[osi-与-tcp-ip-模型]]"
 uuid: f182053e-6ef4-4e71-8a73-5e4a8106b633
 created_at: 2026-05-02T13:07:49Z
 updated_at: 2026-05-03T05:12:31Z

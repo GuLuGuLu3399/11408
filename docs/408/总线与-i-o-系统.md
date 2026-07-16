@@ -1,11 +1,11 @@
 ---
 title: 总线与 I-O 系统
-type: 408笔记
+type: note
 subject: 计算机组成原理
-status: 待复习
+status: review
 related_to:
-  - "[[i-o-管理]]"
-  - "[[cpu-与流水线]]"
+- "[[i-o-管理]]"
+- "[[cpu-与流水线]]"
 uuid: a3022b42-2cab-4420-a075-4aaf7c5c1850
 created_at: 2026-05-02T13:07:49Z
 updated_at: 2026-05-03T03:42:03Z
