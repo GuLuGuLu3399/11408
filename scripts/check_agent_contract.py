@@ -17,8 +17,8 @@ HORIZONTAL_OPTIONS_PATTERN = re.compile(
     r"(?<![A-Za-z0-9_])A[.、．:：].*?B[.、．:：].*?C[.、．:：].*?D[.、．:：]"
 )
 LEGACY_IDENTIFIER_PATTERN = re.compile(
-    r"(?<![\w-])(?P<identifier>local-rag|study_query|query_documents|"
-    r"read_chunk_neighbors|ingest_file|delete_file)(?![\w-])"
+    r"(?<![A-Za-z0-9_-])(?P<identifier>local-rag|study_query|query_documents|"
+    r"read_chunk_neighbors|ingest_file|delete_file)(?![A-Za-z0-9_-])"
 )
 
 

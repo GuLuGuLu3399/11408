@@ -1,5 +1,8 @@
 import importlib.util
+import io
+import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 
 
@@ -44,6 +47,42 @@ class AgentContractTests(unittest.TestCase):
                 "CLAUDE.md: legacy RAG identifier 'query_documents'",
             ],
             violations,
+        )
+
+    def test_legacy_rag_tool_names_in_chinese_prose_are_rejected(self):
+        violations = self.module.scan_guidance_text(
+            Path("CLAUDE.md"),
+            "调用study_query查询",
+        )
+        self.assertEqual(
+            ["CLAUDE.md: legacy RAG identifier 'study_query'"],
+            violations,
+        )
+
+    def test_legacy_rag_tool_names_in_ascii_identifiers_are_allowed(self):
+        violations = self.module.scan_guidance_text(
+            Path("CLAUDE.md"),
+            "my_study_query_helper and local-rag-service",
+        )
+        self.assertEqual([], violations)
+
+    def test_main_scans_guidance_with_zero_arguments(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            guidance_path = Path(temporary_directory) / "guidance.md"
+            guidance_path.write_text("study_query", encoding="utf-8")
+            original_guidance_files = self.module.GUIDANCE_FILES
+            self.module.GUIDANCE_FILES = (guidance_path,)
+            stderr = io.StringIO()
+            try:
+                with redirect_stderr(stderr):
+                    exit_code = self.module.main([])
+            finally:
+                self.module.GUIDANCE_FILES = original_guidance_files
+
+        self.assertEqual(1, exit_code)
+        self.assertEqual(
+            f"{guidance_path}: legacy RAG identifier 'study_query'\n",
+            stderr.getvalue(),
         )
 
 
