@@ -85,6 +85,30 @@ class AgentContractTests(unittest.TestCase):
             stderr.getvalue(),
         )
 
+    def test_main_scans_positional_markdown_paths_in_line_order(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            markdown_path = Path(temporary_directory) / "questions.md"
+            markdown_path.write_text(
+                "A. first | B. second | C. third | D. fourth\n"
+                "A: first | B: second | C: third | D: fourth\n",
+                encoding="utf-8",
+            )
+            original_guidance_files = self.module.GUIDANCE_FILES
+            self.module.GUIDANCE_FILES = ()
+            stderr = io.StringIO()
+            try:
+                with redirect_stderr(stderr):
+                    exit_code = self.module.main([str(markdown_path)])
+            finally:
+                self.module.GUIDANCE_FILES = original_guidance_files
+
+        self.assertEqual(1, exit_code)
+        self.assertEqual(
+            f"{markdown_path}:1: horizontal multiple-choice options\n"
+            f"{markdown_path}:2: horizontal multiple-choice options\n",
+            stderr.getvalue(),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
