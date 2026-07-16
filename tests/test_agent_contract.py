@@ -1,5 +1,6 @@
 import importlib.util
 import io
+import json
 import tempfile
 import unittest
 from contextlib import redirect_stderr
@@ -7,6 +8,7 @@ from pathlib import Path
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "check_agent_contract.py"
+MCP_CONFIG_PATH = Path(__file__).resolve().parents[1] / ".mcp.json"
 
 
 def load_module():
@@ -107,6 +109,27 @@ class AgentContractTests(unittest.TestCase):
             f"{markdown_path}:1: horizontal multiple-choice options\n"
             f"{markdown_path}:2: horizontal multiple-choice options\n",
             stderr.getvalue(),
+        )
+
+    def test_mcp_config_uses_new_rag_and_memory_servers(self):
+        with MCP_CONFIG_PATH.open(encoding="utf-8") as config_file:
+            servers = json.load(config_file)["mcpServers"]
+
+        self.assertEqual({"study-rag", "memory", "tolaria"}, set(servers))
+        self.assertEqual(
+            "D:\\dev\\study-rag\\python\\.venv\\Scripts\\python.exe",
+            servers["study-rag"]["command"],
+        )
+        self.assertEqual(
+            ["-m", "study_rag.mcp_server"],
+            servers["study-rag"]["args"],
+        )
+        self.assertEqual("1", servers["study-rag"]["env"]["HF_HUB_OFFLINE"])
+        self.assertEqual("cuda", servers["study-rag"]["env"]["STUDY_RAG_DEVICE"])
+        self.assertEqual("cmd", servers["memory"]["command"])
+        self.assertEqual(
+            ["/c", "npx", "-y", "@modelcontextprotocol/server-memory"],
+            servers["memory"]["args"],
         )
 
 
