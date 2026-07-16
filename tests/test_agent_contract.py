@@ -10,6 +10,10 @@ from pathlib import Path
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "check_agent_contract.py"
 MCP_CONFIG_PATH = Path(__file__).resolve().parents[1] / ".mcp.json"
 SETTINGS_PATH = Path(__file__).resolve().parents[1] / ".claude" / "settings.local.json"
+AGENTS_PATH = Path(__file__).resolve().parents[1] / "AGENTS.md"
+NOTE_FORMAT_PATH = (
+    Path(__file__).resolve().parents[1] / ".claude" / "references" / "note-format.md"
+)
 
 
 def load_module():
@@ -149,6 +153,22 @@ class AgentContractTests(unittest.TestCase):
         self.assertEqual(sorted(enabled_positions), enabled_positions)
         self.assertNotIn("local-rag", enabled_servers)
         self.assertFalse(settings.get("env", {}))
+
+    def test_local_study_note_contract_is_available(self):
+        if not AGENTS_PATH.is_file() or not NOTE_FORMAT_PATH.is_file():
+            self.skipTest("local study note guidance is unavailable")
+
+        agents_text = AGENTS_PATH.read_text(encoding="utf-8")
+        note_format_text = NOTE_FORMAT_PATH.read_text(encoding="utf-8")
+
+        for note_type in ("note", "mistake", "flashcard", "progress", "summary"):
+            with self.subTest(note_type=note_type):
+                self.assertIn(note_type, agents_text)
+                self.assertIn(note_type, note_format_text)
+
+        self.assertIn(".claude/references/note-format.md", agents_text)
+        self.assertIn("- **A.**", note_format_text)
+        self.assertIn("horizontal multiple-choice options", note_format_text)
 
 
 if __name__ == "__main__":
