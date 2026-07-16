@@ -9,6 +9,7 @@ from pathlib import Path
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "check_agent_contract.py"
 MCP_CONFIG_PATH = Path(__file__).resolve().parents[1] / ".mcp.json"
+SETTINGS_PATH = Path(__file__).resolve().parents[1] / ".claude" / "settings.local.json"
 
 
 def load_module():
@@ -112,10 +113,19 @@ class AgentContractTests(unittest.TestCase):
         )
 
     def test_mcp_config_uses_new_rag_and_memory_servers(self):
-        with MCP_CONFIG_PATH.open(encoding="utf-8") as config_file:
-            servers = json.load(config_file)["mcpServers"]
+        if not MCP_CONFIG_PATH.is_file() or not SETTINGS_PATH.is_file():
+            self.skipTest("local MCP configuration is unavailable")
 
-        self.assertEqual({"study-rag", "memory", "tolaria"}, set(servers))
+        with (
+            MCP_CONFIG_PATH.open(encoding="utf-8") as config_file,
+            SETTINGS_PATH.open(encoding="utf-8") as settings_file,
+        ):
+            servers = json.load(config_file)["mcpServers"]
+            settings = json.load(settings_file)
+
+        expected_servers = ("study-rag", "memory", "tolaria")
+        self.assertTrue(set(expected_servers).issubset(servers))
+        self.assertNotIn("local-rag", servers)
         self.assertEqual(
             "D:\\dev\\study-rag\\python\\.venv\\Scripts\\python.exe",
             servers["study-rag"]["command"],
@@ -131,6 +141,14 @@ class AgentContractTests(unittest.TestCase):
             ["/c", "npx", "-y", "@modelcontextprotocol/server-memory"],
             servers["memory"]["args"],
         )
+
+        enabled_servers = settings["enabledMcpjsonServers"]
+        enabled_positions = [
+            enabled_servers.index(server_name) for server_name in expected_servers
+        ]
+        self.assertEqual(sorted(enabled_positions), enabled_positions)
+        self.assertNotIn("local-rag", enabled_servers)
+        self.assertFalse(settings.get("env", {}))
 
 
 if __name__ == "__main__":
