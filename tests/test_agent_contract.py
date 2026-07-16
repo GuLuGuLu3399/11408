@@ -266,6 +266,11 @@ class AgentContractTests(unittest.TestCase):
             with self.subTest(prompt_literal=literal):
                 self.assertIn(literal, prompt_text)
 
+        self.assertIn("选择题应便于阅读", prompt_text)
+        self.assertIn("11408-markdown-rendering", prompt_text)
+        self.assertIn(".claude/references/note-format.md", prompt_text)
+        self.assertNotIn("选择题选项竖排", prompt_text)
+
         markdown_destinations = set(
             re.findall(r"\[[^]]+\]\(([^)]+)\)", claude_text)
         )
@@ -328,6 +333,7 @@ class AgentContractTests(unittest.TestCase):
         self.assertIn("type: flashcard", skills["flashcard"])
         self.assertIn("source:", skills["flashcard"])
         self.assertIn("---\ntype: flashcard\nsource:", skills["flashcard"])
+        self.assertIn("# Flashcard title", skills["flashcard"])
         for heading in ("Question", "Answer", "Common Mistake", "Source"):
             with self.subTest(flashcard_heading=heading):
                 self.assertIn(f"## {heading}", skills["flashcard"])
