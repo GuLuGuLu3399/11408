@@ -44,6 +44,8 @@ def main(argv: list[str] | None = None) -> int:
 
     for guidance_path in GUIDANCE_FILES:
         path = repository_root / guidance_path
+        if not path.exists():
+            continue
         violations.extend(scan_guidance_text(guidance_path, path.read_text(encoding="utf-8")))
 
     for path in markdown_paths:

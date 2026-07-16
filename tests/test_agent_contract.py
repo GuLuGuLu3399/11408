@@ -93,6 +93,24 @@ class AgentContractTests(unittest.TestCase):
             stderr.getvalue(),
         )
 
+    def test_main_skips_missing_guidance_files(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            missing_paths = (
+                Path(temporary_directory) / "missing-guidance.md",
+                Path(temporary_directory) / "missing-skill.md",
+            )
+            original_guidance_files = self.module.GUIDANCE_FILES
+            self.module.GUIDANCE_FILES = missing_paths
+            stderr = io.StringIO()
+            try:
+                with redirect_stderr(stderr):
+                    exit_code = self.module.main([])
+            finally:
+                self.module.GUIDANCE_FILES = original_guidance_files
+
+        self.assertEqual(0, exit_code)
+        self.assertEqual("", stderr.getvalue())
+
     def test_main_scans_positional_markdown_paths_in_line_order(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             markdown_path = Path(temporary_directory) / "questions.md"
