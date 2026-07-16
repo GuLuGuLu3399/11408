@@ -17,6 +17,7 @@ NOTE_FORMAT_PATH = (
 )
 CLAUDE_PATH = Path(__file__).resolve().parents[1] / "CLAUDE.md"
 PROMPT_PATH = Path(__file__).resolve().parents[1] / ".claude" / "tolaria-11408-prompt.md"
+README_PATH = Path(__file__).resolve().parents[1] / "README.md"
 SKILL_PATHS = {
     "coach": Path(__file__).resolve().parents[1]
     / ".claude"
@@ -246,15 +247,7 @@ class AgentContractTests(unittest.TestCase):
         self.assertIn("Do not bulk-normalize historical notes.", agents_text)
         self.assertIn(".claude/references/note-format.md", agents_text)
         self.assertIn("This format applies only to new or edited notes.", note_format_text)
-        for option in ("A", "B", "C", "D"):
-            with self.subTest(option=option):
-                self.assertIn(f"- **{option}.**", note_format_text)
-        self.assertIn("| Option | Judgment | Reason |", note_format_text)
-        self.assertIn("horizontal multiple-choice options", note_format_text)
-        self.assertIn(
-            "The same-line form `A. ... | B. ... | C. ... | D. ...` is forbidden.",
-            note_format_text,
-        )
+        self.assertIn("11408-markdown-rendering", note_format_text)
 
     def test_local_vault_guidance_uses_current_read_only_rag_contract(self):
         if not CLAUDE_PATH.is_file() or not PROMPT_PATH.is_file():
@@ -330,7 +323,20 @@ class AgentContractTests(unittest.TestCase):
         self.assertIn("rag_inspect", skills["rag"])
         self.assertIn("note-format.md", skills["mistake"])
         self.assertIn("note-format.md", skills["flashcard"])
+        self.assertIn("11408-markdown-rendering", skills["mistake"])
+        self.assertNotIn("vertically as A-D", skills["mistake"])
+        self.assertIn("type: flashcard", skills["flashcard"])
+        self.assertIn("source:", skills["flashcard"])
+        self.assertIn("---\ntype: flashcard\nsource:", skills["flashcard"])
+        for heading in ("Question", "Answer", "Common Mistake", "Source"):
+            with self.subTest(flashcard_heading=heading):
+                self.assertIn(f"## {heading}", skills["flashcard"])
         self.assertIn("horizontal multiple-choice options", skills["markdown"])
+        self.assertIn("single enforcement owner", skills["markdown"])
+
+    def test_readme_is_scanned_as_guidance(self):
+        self.assertIn(Path("README.md"), self.module.GUIDANCE_FILES)
+        self.assertNotIn("study_query", README_PATH.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

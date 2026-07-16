@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 GUIDANCE_FILES = (
+    Path("README.md"),
     Path("CLAUDE.md"),
     Path(".claude/tolaria-11408-prompt.md"),
     Path(".claude/skills/11408-study-coach/SKILL.md"),

@@ -64,7 +64,7 @@ python scripts\weekly-context-builder.py --write
 ../11408-kb/
 ```
 
-日常复习问答的推荐入口是项目级 `study-rag.study_query`。它负责笔记/错题优先、大资料补充、去重和壳块降噪。不要把大资料 Derived 文件直接当作 Tolaria 笔记扫描。
+日常复习问答的推荐入口是项目级 `study-rag.rag_query`。它负责笔记/错题优先、大资料补充、去重和壳块降噪。不要把大资料 Derived 文件直接当作 Tolaria 笔记扫描。
 
 ## Agent 配置
 
