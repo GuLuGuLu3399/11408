@@ -17,6 +17,33 @@ NOTE_FORMAT_PATH = (
 )
 CLAUDE_PATH = Path(__file__).resolve().parents[1] / "CLAUDE.md"
 PROMPT_PATH = Path(__file__).resolve().parents[1] / ".claude" / "tolaria-11408-prompt.md"
+SKILL_PATHS = {
+    "coach": Path(__file__).resolve().parents[1]
+    / ".claude"
+    / "skills"
+    / "11408-study-coach"
+    / "SKILL.md",
+    "rag": Path(__file__).resolve().parents[1]
+    / ".claude"
+    / "skills"
+    / "11408-rag-query"
+    / "SKILL.md",
+    "mistake": Path(__file__).resolve().parents[1]
+    / ".claude"
+    / "skills"
+    / "11408-mistake-review"
+    / "SKILL.md",
+    "flashcard": Path(__file__).resolve().parents[1]
+    / ".claude"
+    / "skills"
+    / "11408-flashcard"
+    / "SKILL.md",
+    "markdown": Path(__file__).resolve().parents[1]
+    / ".claude"
+    / "skills"
+    / "11408-markdown-rendering"
+    / "SKILL.md",
+}
 
 
 def load_module():
@@ -276,6 +303,34 @@ class AgentContractTests(unittest.TestCase):
             ):
                 with self.subTest(path=path, legacy_identifier=legacy_identifier):
                     self.assertNotIn(legacy_identifier, text)
+
+    def test_local_skill_contract_is_available(self):
+        if not all(path.is_file() for path in SKILL_PATHS.values()):
+            self.skipTest("local skill guidance is unavailable")
+
+        skills = {name: path.read_text(encoding="utf-8") for name, path in SKILL_PATHS.items()}
+        for name, text in skills.items():
+            with self.subTest(skill=name):
+                description = re.search(r"^description: (?P<value>.+)$", text, re.MULTILINE)
+                self.assertIsNotNone(description)
+                assert description is not None
+                self.assertTrue(description.group("value").startswith("Use when"))
+                self.assertLess(len(description.group("value")), 500)
+                for legacy_identifier in (
+                    "local-rag",
+                    "study_query",
+                    "query_documents",
+                    "read_chunk_neighbors",
+                    "ingest_file",
+                    "delete_file",
+                ):
+                    self.assertNotIn(legacy_identifier, text)
+
+        self.assertIn("11408-rag-query", skills["coach"])
+        self.assertIn("rag_inspect", skills["rag"])
+        self.assertIn("note-format.md", skills["mistake"])
+        self.assertIn("note-format.md", skills["flashcard"])
+        self.assertIn("horizontal multiple-choice options", skills["markdown"])
 
 
 if __name__ == "__main__":
