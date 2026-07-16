@@ -246,21 +246,23 @@ class AgentContractTests(unittest.TestCase):
             with self.subTest(prompt_literal=literal):
                 self.assertIn(literal, prompt_text)
 
-        for link in (
+        markdown_destinations = set(
+            re.findall(r"\[[^]]+\]\(([^)]+)\)", claude_text)
+        )
+        for destination in (
             "AGENTS.md",
             ".claude/tolaria-11408-prompt.md",
+            ".claude/references/note-format.md",
             ".claude/skills/11408-study-coach/SKILL.md",
             ".claude/skills/11408-rag-query/SKILL.md",
             ".claude/skills/11408-mistake-review/SKILL.md",
             ".claude/skills/11408-flashcard/SKILL.md",
             ".claude/skills/11408-markdown-rendering/SKILL.md",
         ):
-            with self.subTest(claude_link=link):
-                self.assertIn(link, claude_text)
+            with self.subTest(markdown_destination=destination):
+                self.assertIn(destination, markdown_destinations)
+                self.assertTrue((CLAUDE_PATH.parent / destination).is_file())
 
-        self.assertIn(
-            "[共享笔记格式参考](.claude/references/note-format.md)", claude_text
-        )
         self.assertIn("保留用户原始中文和考试术语", prompt_text)
 
         for path, text in ((CLAUDE_PATH, claude_text), (PROMPT_PATH, prompt_text)):
