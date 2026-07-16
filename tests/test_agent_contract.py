@@ -166,8 +166,35 @@ class AgentContractTests(unittest.TestCase):
                 self.assertIn(note_type, agents_text)
                 self.assertIn(note_type, note_format_text)
 
+        expected_outlines = (
+            "| `note` | Conclusion; conditions or steps | Traps |",
+            "| `mistake` | Problem; options where applicable; my answer; correct answer; "
+            "error cause; recognition signal | - |",
+            "| `flashcard` | Question; answer; common mistake; source | - |",
+            "| `progress` | Completed work; blocker; next action | - |",
+            "| `summary` | Scope; connections; unresolved gaps | - |",
+        )
+        for outline in expected_outlines:
+            with self.subTest(outline=outline):
+                self.assertIn(outline, note_format_text)
+
+        self.assertIn(
+            "Add `subject`, `status`, `topics`, `related_to`, and `source` only when "
+            "they are meaningful for that note.",
+            agents_text,
+        )
+        self.assertIn(
+            "Preserve the existing frontmatter key style when editing a note.",
+            agents_text,
+        )
+        self.assertIn("Use the first H1 as the note title.", agents_text)
+        self.assertIn("Do not bulk-normalize historical notes.", agents_text)
         self.assertIn(".claude/references/note-format.md", agents_text)
-        self.assertIn("- **A.**", note_format_text)
+        self.assertIn("This format applies only to new or edited notes.", note_format_text)
+        for option in ("A", "B", "C", "D"):
+            with self.subTest(option=option):
+                self.assertIn(f"- **{option}.**", note_format_text)
+        self.assertIn("| Option | Judgment | Reason |", note_format_text)
         self.assertIn("horizontal multiple-choice options", note_format_text)
 
 
