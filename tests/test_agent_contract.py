@@ -15,6 +15,8 @@ AGENTS_PATH = Path(__file__).resolve().parents[1] / "AGENTS.md"
 NOTE_FORMAT_PATH = (
     Path(__file__).resolve().parents[1] / ".claude" / "references" / "note-format.md"
 )
+CLAUDE_PATH = Path(__file__).resolve().parents[1] / "CLAUDE.md"
+PROMPT_PATH = Path(__file__).resolve().parents[1] / ".claude" / "tolaria-11408-prompt.md"
 
 
 def load_module():
@@ -226,6 +228,48 @@ class AgentContractTests(unittest.TestCase):
             "The same-line form `A. ... | B. ... | C. ... | D. ...` is forbidden.",
             note_format_text,
         )
+
+    def test_local_vault_guidance_uses_current_read_only_rag_contract(self):
+        if not CLAUDE_PATH.is_file() or not PROMPT_PATH.is_file():
+            self.skipTest("local vault guidance is unavailable")
+
+        claude_text = CLAUDE_PATH.read_text(encoding="utf-8")
+        prompt_text = PROMPT_PATH.read_text(encoding="utf-8")
+
+        for literal in (
+            "study-rag.rag_query",
+            "study-rag.rag_inspect",
+            "strict RAG filter",
+            "memory",
+            "not an evidence source",
+        ):
+            with self.subTest(prompt_literal=literal):
+                self.assertIn(literal, prompt_text)
+
+        for link in (
+            "AGENTS.md",
+            ".claude/tolaria-11408-prompt.md",
+            ".claude/references/note-format.md",
+            ".claude/skills/11408-study-coach/SKILL.md",
+            ".claude/skills/11408-rag-query/SKILL.md",
+            ".claude/skills/11408-mistake-review/SKILL.md",
+            ".claude/skills/11408-flashcard/SKILL.md",
+            ".claude/skills/11408-markdown-rendering/SKILL.md",
+        ):
+            with self.subTest(claude_link=link):
+                self.assertIn(link, claude_text)
+
+        for path, text in ((CLAUDE_PATH, claude_text), (PROMPT_PATH, prompt_text)):
+            for legacy_identifier in (
+                "local-rag",
+                "study_query",
+                "query_documents",
+                "read_chunk_neighbors",
+                "ingest_file",
+                "delete_file",
+            ):
+                with self.subTest(path=path, legacy_identifier=legacy_identifier):
+                    self.assertNotIn(legacy_identifier, text)
 
 
 if __name__ == "__main__":
